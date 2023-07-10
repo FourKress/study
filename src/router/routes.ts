@@ -59,8 +59,8 @@ export const routes = [
         },
       },
       {
-        path: '/user',
-        name: 'User',
+        path: '/agentUser',
+        name: 'AgentUser',
         component: () => import('/@/views/user/index.vue'),
         meta: {
           title: '我的',

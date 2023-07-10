@@ -14,7 +14,7 @@
         </div>
         <div class="row">
           <span class="label">身份证号:</span>
-          <span class="text">{{ item.custId }}</span>
+          <span class="text">{{ item.idNo }}</span>
         </div>
         <div class="row">
           <span class="label">手机号:</span>
@@ -22,14 +22,14 @@
         </div>
       </div>
       <div class="footer">
-        <div class="btn" @click="handleCheckDetails">查看详情</div>
+        <div class="btn" @click="handleCheckDetails(item)">查看详情</div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup name="AgentReportPage">
-  import { agentReportList } from '/@/api';
+  import { agentReportList, custReportView } from '/@/api';
   import { onMounted, ref } from 'vue';
 
   let reportList = ref([]);
@@ -45,6 +45,11 @@
   };
   const handleCheckDetails = (item) => {
     console.log(item);
+    custReportView({
+      paySerialNo: item.paySerialNo,
+    }).then((res) => {
+        console.log(res.data.value)
+    });
   };
 </script>
 

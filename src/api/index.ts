@@ -248,3 +248,13 @@ export function agentOrderList() {
     method: 'POST',
   });
 }
+
+/**
+ * binding
+ * @returns UseAxiosReturn
+ */
+export function wechatBinding() {
+  return useAxiosApi(`/api/wechat/binding`, {
+    method: 'POST',
+  });
+}
