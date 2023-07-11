@@ -19,7 +19,7 @@
           <span class="text">{{ item.custName }}</span>
         </div>
       </div>
-      <div class="footer" v-if="item.applyStatus === 'SUCCESS'">
+      <div class="footer" v-if="item.applyStatus === 'SUCCESS' && item.share === 'Y'">
         <div class="btn" @click="handleReport(item)">可阅报告</div>
       </div>
     </div>

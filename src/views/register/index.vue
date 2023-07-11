@@ -1,9 +1,9 @@
 <template>
   <div class="register-page">
     <div class="register-top">
-      <img src="" alt="" />
+      <img src="../../assets/logo.png" alt="" />
       <div class="info">
-        <span class="title">{{ isRegister ? '借贷风险评估' : '登录查看报告' }}</span>
+        <span class="title">{{ isRegister ? '风险评估' : '登录查看报告' }}</span>
         <span class="sub-tips">{{ isRegister ? '为保证报告准确，请输入真实信息' : '登录后可查看已购买报告' }}</span>
         <CustomerService>
           <van-icon size="20" name="service" color="#fff" />
@@ -258,11 +258,11 @@
 <style scoped lang="scss">
   .register-page {
     min-height: 100%;
-
     padding: 42px 42px 0;
     box-sizing: border-box;
     background-color: #ccc;
     padding-bottom: calc(42px + env(safe-area-inset-bottom));
+    background-image: linear-gradient(to bottom, #3c93d4, #026abb);
 
     .register-top {
       display: flex;
@@ -278,8 +278,6 @@
         position: absolute;
         left: 0;
         top: 0;
-
-        background: #333;
       }
 
       .info {

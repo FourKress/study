@@ -1,6 +1,6 @@
 export const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'Home',
     component: () => import('/@/layout/index.vue'),
     meta: {
@@ -15,15 +15,6 @@ export const routes = [
         meta: {
           hasTabbar: false,
           title: '我的报告',
-        },
-      },
-      {
-        path: '/orderDetails',
-        name: 'OrderDetails',
-        component: () => import('/@/views/order/details.vue'),
-        meta: {
-          hasTabbar: false,
-          title: '报告详情',
         },
       },
       {
@@ -94,9 +85,18 @@ export const routes = [
     component: () => import('/@/views/register/index.vue'),
   },
   {
-    path: '/agentRegister',
+    path: '/',
     name: 'AgentRegister',
     component: () => import('/@/views/agent-register/index.vue'),
+  },
+  {
+    path: '/reportDetails',
+    name: 'ReportDetails',
+    component: () => import('/@/views/agent-report/details.vue'),
+    meta: {
+      hasTabbar: false,
+      title: '报告详情',
+    },
   },
 
   // 匹配不到重定向会主页

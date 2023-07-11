@@ -64,7 +64,7 @@
     },
     {
       label: '我的',
-      path: '/user',
+      path: '/agentUser',
       icon: 'contact',
     },
   ];

@@ -1,7 +1,7 @@
 <template>
   <div class="agent-register-page">
     <div class="register-top">
-      <img src="" alt="" />
+        <img src="../../assets/logo.png" alt="" />
       <div class="info">
         <span class="title">代理认证</span>
         <span class="sub-tips">请填写认证信息成为代理</span>
@@ -161,6 +161,7 @@
     box-sizing: border-box;
     background-color: #ccc;
     padding-bottom: calc(42px + env(safe-area-inset-bottom));
+    background-image: linear-gradient(to bottom, #3c93d4, #026abb);
 
     .register-top {
       display: flex;
@@ -176,8 +177,6 @@
         position: absolute;
         left: 0;
         top: 0;
-
-        background: #333;
       }
 
       .info {

@@ -3,11 +3,12 @@ import axios from 'axios';
 import { showToast } from 'vant';
 import 'vant/es/toast/style';
 import { useCookies } from '@vueuse/integrations/useCookies';
+import * as process from "process";
 
 const instance = axios.create({
   withCredentials: false,
   timeout: 5000,
-  baseURL: '/QCApi',
+  baseURL: process.env.NODE_ENV === "production" ? 'https://rpt.quchaq.com/' : '/QCApi',
 });
 
 const { VITE_TOKEN_KEY } = import.meta.env;
