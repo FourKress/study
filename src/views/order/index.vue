@@ -4,6 +4,7 @@
       <div class="top">
         <span class="label">{{ item.productName }}</span>
         <span class="status">{{ applyStatusMap[item.applyStatus] }}</span>
+        <van-button type="primary" size="mini" v-if="item.applyStatus === 'SUCCESS'">查看详情</van-button>
       </div>
       <div class="info">
         <div class="row">
@@ -24,14 +25,16 @@
         <span class="amount">¥{{ item.payAmt }}</span>
       </div>
       <div class="footer">
-        <div class="btn" v-if="item.applyStatus === 'SUCCESS' && item.share === 'Y'" @click.self.stop="handleSendAgent(item)">发送代理商</div>
-        <div class="btn" v-if="item.applyStatus === 'SUCCESS'" @click.self.stop="handleDownload(item)">下载</div>
+        <div class="btn" v-if="item.applyStatus === 'SUCCESS' && item.share === 'Y'" @click.stop="handleSendAgent(item)"
+          >发送代理商</div
+        >
+        <div class="btn" v-if="item.applyStatus === 'SUCCESS'" @click.stop="handleDownload(item)">下载</div>
 
         <div class="btn" v-if="item.applyStatus === 'FAILURE'"> <CustomerService>联系客服</CustomerService></div>
-        <div class="btn" v-if="item.applyStatus === 'FAILURE'" @click.self.stop="handleRetry(item)">重试</div>
+        <div class="btn" v-if="item.applyStatus === 'FAILURE'" @click.stop="handleRetry(item)">重试</div>
 
-        <div class="btn" v-if="item.applyStatus === 'REFUND'" @click.self.stop="handleSearch">去查询</div>
-        <div class="btn" v-if="item.applyStatus === 'APPLY'" @click.self.stop="handleCheckExample">查看示例</div>
+        <div class="btn" v-if="item.applyStatus === 'REFUND'" @click.stop="handleSearch">去查询</div>
+        <div class="btn" v-if="item.applyStatus === 'APPLY'" @click.stop="handleCheckExample">查看示例</div>
       </div>
     </div>
   </div>

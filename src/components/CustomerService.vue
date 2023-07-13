@@ -1,6 +1,8 @@
 <template>
-  <div class="right-btn" @click.self.stop="handleQrCode">
-    <slot></slot>
+  <div>
+    <span @click.stop="handleQrCode">
+      <slot></slot>
+    </span>
     <van-dialog title="客服二维码" teleport="body" v-model:show="showQrcode" @confirm="handleCloseQrCode">
       <div class="qrcode-container">
         <img class="img" :src="qrcodeInfo.qrcode" />

@@ -255,25 +255,23 @@
       ><div class="hrbox"
         ><div class="hrboxp1"
           ><span
-            >银行高风险
+            ><span>银行高风险</span>
             <span style="font-style: italic; margin-left: 20px">{{ blackListInfo.bank_lost === '0' ? '命中' : '否' }}</span></span
           ><span style="color: rgb(221, 82, 77); font-size: 12px">命中次数：{{ blackListInfo.bank_lost_allnum }}</span></div
         ></div
       ><div class="hrbox"
         ><div class="hrboxp1"
           ><span
-            >法院失信人<span style="font-style: italic; margin-left: 20px">{{
-              blackListInfo.court_bad === '0' ? '命中' : '否'
-            }}</span></span
-          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中风险：{{ blackListInfo.court_bad_allnum }}</span></div
+            ><span>法院失信人</span
+            ><span style="font-style: italic; margin-left: 20px">{{ blackListInfo.court_bad === '0' ? '命中' : '否' }}</span></span
+          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中次数：{{ blackListInfo.court_bad_allnum }}</span></div
         ></div
       ><div class="hrbox"
         ><div class="hrboxp1"
           ><span
-            >法院被执行人<span style="font-style: italic; margin-left: 20px">{{
-              blackListInfo.court_executed === '0' ? '命中' : '否'
-            }}</span></span
-          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中风险：{{ blackListInfo.court_executed_allnum }}</span></div
+            ><span>法院被执行人</span
+            ><span style="font-style: italic; margin-left: 20px">{{ blackListInfo.court_executed === '0' ? '命中' : '否' }}</span></span
+          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中次数：{{ blackListInfo.court_executed_allnum }}</span></div
         ></div
       ></div
     >
@@ -283,48 +281,44 @@
       ><div class="hrbox"
         ><div class="hrboxp1"
           ><span
-            >持牌网络小贷高风险
+            ><span>持牌网络小贷高风险</span>
             <span style="font-style: italic; margin-left: 20px">{{ blackListInfo.nbank_nsloan_lost === '0' ? '命中' : '否' }}</span></span
-          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中风险：{{ blackListInfo.nbank_nsloan_lost_allnum }}</span></div
+          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中次数：{{ blackListInfo.nbank_nsloan_lost_allnum }}</span></div
         ></div
       ><div class="hrbox"
         ><div class="hrboxp1"
           ><span
-            >持牌小贷高风险<span style="font-style: italic; margin-left: 20px">{{
-              blackListInfo.nbank_sloan_lost === '0' ? '命中' : '否'
-            }}</span></span
-          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中风险：{{ blackListInfo.nbank_sloan_lost_allnum }}</span></div
+            ><span>持牌小贷高风险</span
+            ><span style="font-style: italic; margin-left: 20px">{{ blackListInfo.nbank_sloan_lost === '0' ? '命中' : '否' }}</span></span
+          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中次数：{{ blackListInfo.nbank_sloan_lost_allnum }}</span></div
         ></div
       ><div class="hrbox"
         ><div class="hrboxp1"
           ><span
-            >持牌消费金融高风险<span style="font-style: italic; margin-left: 20px">{{
-              blackListInfo.nbank_cons_lost === '0' ? '命中' : '否'
-            }}</span></span
-          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中风险：{{ blackListInfo.nbank_cons_lost_allnum }}</span></div
+            ><span>持牌消费金融高风险</span
+            ><span style="font-style: italic; margin-left: 20px">{{ blackListInfo.nbank_cons_lost === '0' ? '命中' : '否' }}</span></span
+          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中次数：{{ blackListInfo.nbank_cons_lost_allnum }}</span></div
         ></div
       ><div class="hrbox"
         ><div class="hrboxp1"
           ><span
-            >持牌融资租赁高风险
+            ><span>持牌融资租赁高风险</span>
             <span style="font-style: italic; margin-left: 20px">{{ blackListInfo.nbank_finlea_lost === '0' ? '命中' : '否' }}</span></span
-          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中风险：{{ blackListInfo.nbank_finlea_lost_allnum }}</span></div
+          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中次数：{{ blackListInfo.nbank_finlea_lost_allnum }}</span></div
         ></div
       ><div class="hrbox"
         ><div class="hrboxp1"
           ><span
-            >持牌汽车金融高风险<span style="font-style: italic; margin-left: 20px">{{
-              blackListInfo.nbank_autofin_lost === '0' ? '命中' : '否'
-            }}</span></span
-          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中风险：{{ blackListInfo.nbank_autofin_lost_allnum }}</span></div
+            ><span>持牌汽车金融高风险</span
+            ><span style="font-style: italic; margin-left: 20px">{{ blackListInfo.nbank_autofin_lost === '0' ? '命中' : '否' }}</span></span
+          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中次数：{{ blackListInfo.nbank_autofin_lost_allnum }}</span></div
         ></div
       ><div class="hrbox"
         ><div class="hrboxp1"
           ><span
-            >其他高风险<span style="font-style: italic; margin-left: 20px">{{
-              blackListInfo.nbank_other_lost === '0' ? '命中' : '否'
-            }}</span></span
-          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中风险：{{ blackListInfo.nbank_other_lost_allnum }}</span></div
+            ><span>其他高风险</span
+            ><span style="font-style: italic; margin-left: 20px">{{ blackListInfo.nbank_other_lost === '0' ? '命中' : '否' }}</span></span
+          ><span style="color: rgb(221, 82, 77); font-size: 12px">命中次数：{{ blackListInfo.nbank_other_lost_allnum }}</span></div
         ></div
       ></div
     >
@@ -969,6 +963,13 @@
           display: flex;
           justify-content: space-between;
           font-size: 26px;
+
+          span {
+            span:first-child {
+              display: inline-block;
+              min-width: 300px;
+            }
+          }
         }
 
         .hrboxp2 {
