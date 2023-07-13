@@ -29,9 +29,11 @@
 </template>
 
 <script lang="ts" setup name="AgentReportPage">
-  import { agentReportList, custReportView } from '/@/api';
+  import { agentReportList } from '/@/api';
   import { onMounted, ref } from 'vue';
+  import { useRouter } from 'vue-router';
 
+  const router = useRouter();
   let reportList = ref([]);
 
   onMounted(() => {
@@ -45,11 +47,7 @@
   };
   const handleCheckDetails = (item) => {
     console.log(item);
-    custReportView({
-      paySerialNo: item.paySerialNo,
-    }).then((res) => {
-        console.log(res.data.value)
-    });
+    router.push(`/reportDetails?paySerialNo=${item.paySerialNo}`);
   };
 </script>
 

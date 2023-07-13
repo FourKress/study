@@ -1,5 +1,5 @@
 <template>
-  <div class="right-btn" @click="handleQrCode">
+  <div class="right-btn" @click.self.stop="handleQrCode">
     <slot></slot>
     <van-dialog title="客服二维码" teleport="body" v-model:show="showQrcode" @confirm="handleCloseQrCode">
       <div class="qrcode-container">

@@ -3,12 +3,13 @@ import axios from 'axios';
 import { showToast } from 'vant';
 import 'vant/es/toast/style';
 import { useCookies } from '@vueuse/integrations/useCookies';
-import * as process from "process";
+import * as process from 'process';
+import router from '../router';
 
 const instance = axios.create({
   withCredentials: false,
   timeout: 5000,
-  baseURL: process.env.NODE_ENV === "production" ? 'https://rpt.quchaq.com/' : '/QCApi',
+  baseURL: process.env.NODE_ENV === 'production' ? 'https://rpt.quchaq.com/' : '/QCApi',
 });
 
 const { VITE_TOKEN_KEY } = import.meta.env;
@@ -64,8 +65,9 @@ instance.interceptors.response.use(
     if (res.code !== code) {
       showToast(res.msg);
       // 412: Token expired;
-      if (res.code === 412) {
+      if (res.code === '0010') {
         // store.dispatch('user/userLogout');
+        router.push('/register');
       }
       return Promise.reject(res || 'Error');
     } else {

@@ -90,7 +90,7 @@
 
   const router = useRouter();
   const userStore = useUserStore();
-  const { agentNo = '', productCode = '' } = getUrlParams2(window.location.href);
+  const { agentNo = 'ATqucha', productCode = 'BASE' } = getUrlParams2(window.location.href);
   const userName = ref('');
   const idNo = ref('');
   const mobile = ref('');

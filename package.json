@@ -16,6 +16,7 @@
     "@vueuse/integrations": "10.1.2",
     "axios": "1.4.0",
     "dayjs": "^1.11.8",
+    "echarts": "^5.4.2",
     "mitt": "^3.0.0",
     "pinia": "^2.1.0",
     "pinia-plugin-persistedstate": "^3.1.0",

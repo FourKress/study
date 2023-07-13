@@ -1,6 +1,6 @@
 <template>
   <div class="order">
-    <div class="item" v-for="item in orderList" :key="item">
+    <div class="item" v-for="item in orderList" :key="item" @click="handleCheckDetails(item)">
       <div class="top">
         <span class="label">{{ item.productName }}</span>
         <span class="status">{{ applyStatusMap[item.applyStatus] }}</span>
@@ -24,14 +24,14 @@
         <span class="amount">¥{{ item.payAmt }}</span>
       </div>
       <div class="footer">
-        <div class="btn" v-if="item.applyStatus === 'SUCCESS' && item.share === 'Y'" @click="handleSendAgent(item)">发送代理商</div>
-        <div class="btn" v-if="item.applyStatus === 'SUCCESS'" @click="handleDownload(item)">下载</div>
+        <div class="btn" v-if="item.applyStatus === 'SUCCESS' && item.share === 'Y'" @click.self.stop="handleSendAgent(item)">发送代理商</div>
+        <div class="btn" v-if="item.applyStatus === 'SUCCESS'" @click.self.stop="handleDownload(item)">下载</div>
 
         <div class="btn" v-if="item.applyStatus === 'FAILURE'"> <CustomerService>联系客服</CustomerService></div>
-        <div class="btn" v-if="item.applyStatus === 'FAILURE'" @click="handleRetry(item)">重试</div>
+        <div class="btn" v-if="item.applyStatus === 'FAILURE'" @click.self.stop="handleRetry(item)">重试</div>
 
-        <div class="btn" v-if="item.applyStatus === 'REFUND'" @click="handleSearch">去查询</div>
-        <div class="btn" v-if="item.applyStatus === 'APPLY'" @click="handleCheckExample">查看示例</div>
+        <div class="btn" v-if="item.applyStatus === 'REFUND'" @click.self.stop="handleSearch">去查询</div>
+        <div class="btn" v-if="item.applyStatus === 'APPLY'" @click.self.stop="handleCheckExample">查看示例</div>
       </div>
     </div>
   </div>
@@ -120,6 +120,10 @@
 
   const handleSearch = () => {
     router.push(`/register?productCode=${sessionStorage.getItem('productCode')}`);
+  };
+
+  const handleCheckDetails = (order) => {
+    router.push(`/reportDetails?paySerialNo=${order.paySerialNo}`);
   };
 </script>
 

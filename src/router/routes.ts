@@ -65,7 +65,15 @@ export const routes = [
           title: '我的订单',
         },
       },
-
+      {
+        path: '/reportDetails',
+        name: 'ReportDetails',
+        component: () => import('/@/views/agent-report/details.vue'),
+        meta: {
+          hasTabbar: false,
+          title: '报告详情',
+        },
+      },
       {
         path: '/protocol',
         name: 'Protocol',
@@ -88,15 +96,6 @@ export const routes = [
     path: '/',
     name: 'AgentRegister',
     component: () => import('/@/views/agent-register/index.vue'),
-  },
-  {
-    path: '/reportDetails',
-    name: 'ReportDetails',
-    component: () => import('/@/views/agent-report/details.vue'),
-    meta: {
-      hasTabbar: false,
-      title: '报告详情',
-    },
   },
 
   // 匹配不到重定向会主页
