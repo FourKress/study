@@ -88,12 +88,12 @@ export const routes = [
     component: () => import('/@/views/protocol/index.vue'),
   },
   {
-    path: '/register',
+    path: '/',
     name: 'Register',
     component: () => import('/@/views/register/index.vue'),
   },
   {
-    path: '/',
+    path: '/agentRegister',
     name: 'AgentRegister',
     component: () => import('/@/views/agent-register/index.vue'),
   },
