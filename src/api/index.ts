@@ -253,8 +253,20 @@ export function agentOrderList() {
  * binding
  * @returns UseAxiosReturn
  */
-export function wechatBinding() {
+export function wechatBinding(data) {
   return useAxiosApi(`/api/wechat/binding`, {
     method: 'POST',
+    data,
+  });
+}
+
+/**
+ * binding
+ * @returns UseAxiosReturn
+ */
+export function getAgentInfo(params) {
+  return useAxiosApi(`/rpt/agent/api/v1/agentInfo`, {
+    method: 'GET',
+    params,
   });
 }

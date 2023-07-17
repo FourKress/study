@@ -45,9 +45,12 @@
         <div class="protocol" v-if="isRegister">
           <van-checkbox v-model="checked" />
           <span class="tips"
-            >您已阅读并同意<span class="link">《用户服务协议》</span><span class="link">《异议说明》</span
-            ><span class="link">《代收代付协议》</span
-            ><span class="link">《授权书》</span>，点击勾选即代表您同意上述法律文书的相关条款并签署上述法律文书。</span
+            >您已阅读并同意<span class="link" @click="openProtocol('customer')">《用户协议》</span
+            ><span class="link" @click="openProtocol('objection')">《异议说明》</span
+            ><span class="link" @click="openProtocol('tripartite')">《代收代付三方协议》</span
+            ><span class="link" @click="openProtocol('auth')">《授权书》</span
+            ><span class="link" @click="openProtocol('server')">《信息技术服务合同》</span
+            >，点击勾选即代表您同意上述法律文书的相关条款并签署上述法律文书。</span
           >
         </div>
 
@@ -75,6 +78,15 @@
         <van-button type="primary" block :disabled="!selectPay" @click="handlePay">立即支付</van-button>
       </div>
     </van-action-sheet>
+
+    <Protocol
+      :protocolType="protocolType"
+      :name="userName"
+      :mobile="mobile"
+      :idNo="idNo"
+      :agentName="agentName"
+      :agentMobile="agentMobile"
+    />
   </div>
 </template>
 
@@ -84,7 +96,8 @@
   import { showToast } from 'vant';
   import Advertising from '/@/components/Advertising.vue';
   import CustomerService from '/@/components/CustomerService.vue';
-  import { agentProductAmt, custLoginBySms, custReport, getSmsCode } from '/@/api';
+  import Protocol from '/@/components/protocol.vue';
+  import { agentProductAmt, custLoginBySms, custReport, getSmsCode, getAgentInfo } from '/@/api';
   import { getUrlParams2, judgeClient } from '/@/utils';
   import { useUserStore } from '/@/store/modules/user';
 
@@ -107,6 +120,9 @@
   let timer = ref(0);
   let amt = ref(0);
   const checked = ref(false);
+  const protocolType = ref('');
+  const agentName = ref('');
+  const agentMobile = ref('');
 
   sessionStorage.setItem('agentNo', agentNo);
   sessionStorage.setItem('productCode', productCode);
@@ -252,6 +268,23 @@
 
   const handlePay = () => {
     router.push(`/order`);
+  };
+
+  const openProtocol = async (type) => {
+    if (userName.value && mobile.value && mobile.value) {
+      if (type === 'tripartite') {
+        const res = await getAgentInfo({
+          agentNo: agentNo,
+        });
+        const agentInfo = res.data.value;
+        agentName.value = agentInfo.agentName;
+        agentMobile.value = agentInfo.agentMobile;
+      }
+
+      protocolType.value = type;
+    } else {
+      showToast('请先输入姓名、身份证号、手机号');
+    }
   };
 </script>
 

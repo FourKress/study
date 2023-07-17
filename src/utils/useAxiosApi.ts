@@ -48,9 +48,7 @@ instance.interceptors.response.use(
   (response) => {
     const {
       data: res,
-      config: { url = '' },
     } = response;
-    const code = url.includes('common') ? 0 : '0000';
     // 下载类型的请求, 返回值为ArrayBuffer类型,做特殊处理, 请求时需要设置 responseType: 'arraybuffer',
     const isArrayBuffer = res instanceof ArrayBuffer;
     if (isArrayBuffer) {
@@ -61,12 +59,10 @@ instance.interceptors.response.use(
         }),
       );
     }
-
-    if (res.code !== code) {
+    if (![0, '0000'].includes(res.code)) {
       showToast(res.msg);
       // 412: Token expired;
       if (res.code === '0010') {
-        // store.dispatch('user/userLogout');
         router.push('/register');
       }
       return Promise.reject(res || 'Error');

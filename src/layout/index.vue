@@ -1,6 +1,6 @@
 <template>
   <div class="layout">
-    <van-nav-bar placeholder left-arrow @click-left="onClickLeft">
+    <van-nav-bar placeholder left-arrow v-if="!notNavbar" @click-left="onClickLeft">
       <template #left>
         <van-icon size="20" color="#fff" name="arrow-left" />
       </template>
@@ -19,6 +19,9 @@
           <router-view />
         </div>
       </div>
+        <CustomerService :isOpen="open">
+            <van-icon size="20" name="service" color="#fff" />
+        </CustomerService>
     </div>
     <van-tabbar route placeholder v-if="hasTabbar">
       <van-tabbar-item v-for="tabbar in tabbarList" :key="tabbar.path" replace :to="`${tabbar.path}`" :icon="tabbar.icon">{{
@@ -29,18 +32,32 @@
 </template>
 
 <script lang="ts" setup name="BasicLayoutPage">
-  import { ref, watch } from 'vue';
+  import { ref, watch, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
+  import { getUrlParams2 } from '/@/utils';
+
+  const { customer = '' } = getUrlParams2(window.location.href);
+
+  onMounted(() => {
+      if (customer) {
+        open.value = true;
+      }
+  })
+
   const onClickLeft = () => history.back();
 
   let hasTabbar = ref(true);
+  let notNavbar = ref(false);
   let title = ref('');
+  const open = ref(false)
 
   const route = useRoute();
   watch(
     () => route?.meta,
     (val = {}) => {
       hasTabbar.value = val?.hasTabbar;
+        notNavbar.value = val?.notNavbar;
+        console.log(val)
       title.value = val?.title;
     },
     { immediate: true },

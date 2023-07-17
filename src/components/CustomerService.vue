@@ -13,8 +13,24 @@
 </template>
 
 <script lang="ts" setup name="CustomerService">
-  import { ref } from 'vue';
+  import { ref, defineProps, watch } from 'vue';
   import { customerService } from '/@/api';
+
+  const props = defineProps({
+    isOpen: {
+      type: Boolean,
+      required: false,
+    },
+  });
+
+  watch(
+    () => props?.isOpen,
+    (val = {}) => {
+      if (val) {
+        handleQrCode();
+      }
+    },
+  );
 
   let showQrcode = ref(false);
   const qrcodeInfo = ref({});

@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     Advertising: typeof import('./../src/components/Advertising.vue')['default']
     CustomerService: typeof import('./../src/components/CustomerService.vue')['default']
+    Protocol: typeof import('./../src/components/protocol.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     VanActionSheet: typeof import('vant/es')['ActionSheet']

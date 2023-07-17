@@ -1,7 +1,7 @@
 <template>
   <div class="agent-register-page">
     <div class="register-top">
-        <img src="../../assets/logo.png" alt="" />
+      <img src="../../assets/logo.png" alt="" />
       <div class="info">
         <span class="title">代理认证</span>
         <span class="sub-tips">请填写认证信息成为代理</span>
@@ -36,7 +36,10 @@
         <div class="protocol">
           <van-checkbox v-model="checked" />
           <span class="tips"
-            >您已阅读并同意<span class="link">《代理协议》</span>，点击勾选即代表您同意上述法律文书的相关条款并签署上述法律文书。</span
+            >您已阅读并同意<span class="link" @click="openProtocol('agentCustomer')">《用户协议》</span
+            ><span class="link" @click="openProtocol('agentManager')">《代理商管理制度》</span
+            ><span class="link" @click="openProtocol('objection')">《异议说明》</span
+            >，点击勾选即代表您同意上述法律文书的相关条款并签署上述法律文书。</span
           >
         </div>
 
@@ -45,6 +48,8 @@
         </div>
       </van-form>
     </div>
+
+    <Protocol :protocolType="protocolType" />
   </div>
 </template>
 
@@ -56,6 +61,7 @@
   import { useUserStore } from '/@/store/modules/user';
   import { getUrlParams2 } from '/@/utils';
   import CustomerService from '/@/components/CustomerService.vue';
+  import Protocol from '/@/components/protocol.vue';
 
   const userStore = useUserStore();
   const { agentNo = '' } = getUrlParams2(window.location.href);
@@ -72,6 +78,7 @@
   let countdown = ref(0);
   let timer = ref(0);
   let smsKey = ref(sessionStorage.getItem('smsKey'));
+  const protocolType = ref('');
 
   const validatorUserName = (val) => {
     if (!val) {
@@ -150,6 +157,10 @@
         countdown.value = 0;
         clearInterval(timer.value);
       });
+  };
+
+  const openProtocol = (type) => {
+    protocolType.value = type;
   };
 </script>
 

@@ -4,8 +4,9 @@ export const routes = [
     name: 'Home',
     component: () => import('/@/layout/index.vue'),
     meta: {
-      hasTabbar: true,
-      title: 'Home',
+      hasTabbar: false,
+      notNavbar: true,
+      title: '',
     },
     children: [
       {
@@ -15,6 +16,7 @@ export const routes = [
         meta: {
           hasTabbar: false,
           title: '我的报告',
+          notNavbar: false,
         },
       },
       {
@@ -23,6 +25,8 @@ export const routes = [
         component: () => import('/@/views/agent-product/index.vue'),
         meta: {
           title: '代理产品',
+          hasTabbar: true,
+          notNavbar: false,
         },
       },
       {
@@ -31,6 +35,8 @@ export const routes = [
         component: () => import('/@/views/agent-report/index.vue'),
         meta: {
           title: '可阅报告',
+          hasTabbar: true,
+          notNavbar: false,
         },
       },
       {
@@ -39,6 +45,8 @@ export const routes = [
         component: () => import('/@/views/agent-income/index.vue'),
         meta: {
           title: '我的收益',
+          hasTabbar: true,
+          notNavbar: false,
         },
       },
       {
@@ -47,6 +55,8 @@ export const routes = [
         component: () => import('/@/views/agent-income/details.vue'),
         meta: {
           title: '收益明细',
+          hasTabbar: false,
+          notNavbar: false,
         },
       },
       {
@@ -55,6 +65,8 @@ export const routes = [
         component: () => import('/@/views/user/index.vue'),
         meta: {
           title: '我的',
+          hasTabbar: true,
+          notNavbar: false,
         },
       },
       {
@@ -63,6 +75,8 @@ export const routes = [
         component: () => import('/@/views/agent-order/index.vue'),
         meta: {
           title: '我的订单',
+          hasTabbar: false,
+          notNavbar: false,
         },
       },
       {
@@ -72,20 +86,10 @@ export const routes = [
         meta: {
           hasTabbar: false,
           title: '报告详情',
+          notNavbar: false,
         },
-      },
-      {
-        path: '/protocol',
-        name: 'Protocol',
-        component: () => import('/@/views/protocol/index.vue'),
-      },
+      }
     ],
-  },
-
-  {
-    path: '/protocol',
-    name: 'Protocol',
-    component: () => import('/@/views/protocol/index.vue'),
   },
   {
     path: '/',
