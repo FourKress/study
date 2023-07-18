@@ -25,7 +25,7 @@
       const { token, status, mobile } = res.data.value || {};
 
       // 未认证
-      if (!mobile) {
+      if (!mobile && !location.href.includes('/#/home')) {
         await router.push('/agentRegister');
         return;
       }
