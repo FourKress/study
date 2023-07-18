@@ -4,12 +4,12 @@
 
 <script setup lang="ts">
   import { onMounted } from 'vue';
-  import { useRouter } from 'vue-router';
   import { getUrlParams2 } from '/@/utils';
   import { wechatBinding } from '/@/api';
   import { useUserStore } from '/@/store/modules/user';
+  import { useCookies } from '@vueuse/integrations/useCookies';
 
-  const router = useRouter();
+  const { VITE_TOKEN_KEY } = import.meta.env;
   const userStore = useUserStore();
 
   onMounted(async () => {
@@ -20,6 +20,8 @@
     }
     const { code = '' } = getUrlParams2(window.location.href);
     if (code) {
+      useCookies().remove(VITE_TOKEN_KEY as string);
+
       const res = await wechatBinding({ code });
 
       const { token, status, mobile } = res.data.value || {};
