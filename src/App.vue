@@ -26,7 +26,6 @@
 
       // 未认证
       if (!mobile && !location.href.includes('/#/home')) {
-        await router.push('/agentRegister');
         return;
       }
 
