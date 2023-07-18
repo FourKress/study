@@ -5,10 +5,10 @@
       <div class="info">
         <span class="title">{{ isRegister ? '风险评估' : '登录查看报告' }}</span>
         <span class="sub-tips">{{ isRegister ? '为保证报告准确，请输入真实信息' : '登录后可查看已购买报告' }}</span>
-        <CustomerService>
-          <van-icon size="20" name="service" color="#fff" />
-        </CustomerService>
       </div>
+      <CustomerService class="right-btn">
+        <van-icon size="20" name="service" color="#fff" />
+      </CustomerService>
     </div>
 
     <div class="form-panel">
@@ -87,19 +87,28 @@
       :agentName="agentName"
       :agentMobile="agentMobile"
     />
+
+    <div v-show="showPayQrcode">
+      <van-dialog title="微信支付二维码" :show="true" show-cancel-button :show-confirm-button="false">
+        <div class="qrcode-container">
+          <canvas class="img qrcode"></canvas>
+        </div>
+      </van-dialog>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup name="RegisterPage">
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import { showToast } from 'vant';
+  import { showToast, showLoadingToast, closeToast } from 'vant';
   import Advertising from '/@/components/Advertising.vue';
   import CustomerService from '/@/components/CustomerService.vue';
   import Protocol from '/@/components/protocol.vue';
   import { agentProductAmt, custLoginBySms, custReport, getSmsCode, getAgentInfo } from '/@/api';
   import { getUrlParams2, judgeClient } from '/@/utils';
   import { useUserStore } from '/@/store/modules/user';
+  import QRCode from 'qrcode';
 
   const router = useRouter();
   const userStore = useUserStore();
@@ -123,6 +132,8 @@
   const protocolType = ref('');
   const agentName = ref('');
   const agentMobile = ref('');
+  const payData = ref({});
+  const showPayQrcode = ref(false);
 
   sessionStorage.setItem('agentNo', agentNo);
   sessionStorage.setItem('productCode', productCode);
@@ -190,6 +201,11 @@
     const { idNo, mobile, userName, smsCode } = values;
 
     if (isRegister.value) {
+      showLoadingToast({
+        message: '加载中...',
+        forbidClick: true,
+        duration: 0,
+      });
       custReport({
         agentNo,
         productCode,
@@ -202,8 +218,14 @@
         orderAmt: amt.value,
         terminal: judgeClient(),
       }).then((res) => {
-        handleLogin(res);
-        visiblePay.value = true;
+        payData.value = res?.data?.value;
+        showPayQrcode.value = true;
+        QRCode.toCanvas(document.querySelector('.qrcode'), payData.value.payUrl, function (error) {
+          if (error) console.error(error);
+          console.log('success!');
+          closeToast();
+        });
+        // visiblePay.value = true;
       });
     } else {
       custLoginBySms({
@@ -267,7 +289,8 @@
   };
 
   const handlePay = () => {
-    router.push(`/order`);
+    // router.push(`/order`);
+    // const { payUrl } = payData.value;
   };
 
   const openProtocol = async (type) => {
@@ -471,6 +494,15 @@
         flex: 1;
         text-align: center;
       }
+    }
+  }
+
+  .qrcode-container {
+    .img {
+      display: flex;
+      width: 400px;
+      height: 400px;
+      margin: 50px auto 0;
     }
   }
 </style>

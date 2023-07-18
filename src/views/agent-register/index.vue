@@ -36,8 +36,7 @@
         <div class="protocol">
           <van-checkbox v-model="checked" />
           <span class="tips"
-            >您已阅读并同意<span class="link" @click="openProtocol('agentCustomer')">《用户协议》</span
-            ><span class="link" @click="openProtocol('agentManager')">《代理商管理制度》</span
+            >您已阅读并同意<span class="link" @click="openProtocol('agentManager')">《代理商管理制度》</span
             ><span class="link" @click="openProtocol('objection')">《异议说明》</span
             >，点击勾选即代表您同意上述法律文书的相关条款并签署上述法律文书。</span
           >
