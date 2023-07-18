@@ -11,6 +11,11 @@
   const userStore = useUserStore();
 
   onMounted(async () => {
+    if (!location.href.includes('/#/')) {
+      const href = `${location.origin}/#/${location.href.split('#/')[1]}${location.search}`;
+      window.location.replace(href);
+      return;
+    }
     const { code = '' } = getUrlParams2(window.location.href);
     if (code) {
       const res = await wechatBinding({ code });

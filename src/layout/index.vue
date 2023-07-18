@@ -19,9 +19,9 @@
           <router-view />
         </div>
       </div>
-        <CustomerService :isOpen="open">
-            <van-icon size="20" name="service" color="#fff" />
-        </CustomerService>
+      <CustomerService :isOpen="open">
+        <van-icon size="20" name="service" color="#fff" />
+      </CustomerService>
     </div>
     <van-tabbar route placeholder v-if="hasTabbar">
       <van-tabbar-item v-for="tabbar in tabbarList" :key="tabbar.path" replace :to="`${tabbar.path}`" :icon="tabbar.icon">{{
@@ -36,28 +36,27 @@
   import { useRoute } from 'vue-router';
   import { getUrlParams2 } from '/@/utils';
 
-  const { customer = '' } = getUrlParams2(window.location.href);
+  const { state = '' } = getUrlParams2(window.location.href);
 
   onMounted(() => {
-      if (customer) {
-        open.value = true;
-      }
-  })
+    if (state === 'customer') {
+      open.value = true;
+    }
+  });
 
   const onClickLeft = () => history.back();
 
   let hasTabbar = ref(true);
   let notNavbar = ref(false);
   let title = ref('');
-  const open = ref(false)
+  const open = ref(false);
 
   const route = useRoute();
   watch(
     () => route?.meta,
     (val = {}) => {
       hasTabbar.value = val?.hasTabbar;
-        notNavbar.value = val?.notNavbar;
-        console.log(val)
+      notNavbar.value = val?.notNavbar;
       title.value = val?.title;
     },
     { immediate: true },
