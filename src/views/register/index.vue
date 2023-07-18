@@ -105,7 +105,7 @@
   import Advertising from '/@/components/Advertising.vue';
   import CustomerService from '/@/components/CustomerService.vue';
   import Protocol from '/@/components/protocol.vue';
-  import { agentProductAmt, custLoginBySms, custReport, getSmsCode, getAgentInfo } from '/@/api';
+  import { agentProductAmt, custLoginBySms, custReport, getSmsCode, getAgentInfo, custApplyDetail } from '/@/api';
   import { getUrlParams2, judgeClient } from '/@/utils';
   import { useUserStore } from '/@/store/modules/user';
   import QRCode from 'qrcode';
@@ -224,6 +224,16 @@
           if (error) console.error(error);
           console.log('success!');
           closeToast();
+
+          setTimeout(() => {
+            custApplyDetail({
+              paySerialNo: payData.value.paySerialNo,
+            }).then((result) => {
+              if (result.data.value?.status) {
+                router.push('/order');
+              }
+            });
+          }, 3000);
         });
         // visiblePay.value = true;
       });
