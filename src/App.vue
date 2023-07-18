@@ -4,10 +4,12 @@
 
 <script setup lang="ts">
   import { onMounted } from 'vue';
+  import { useRouter } from 'vue-router';
   import { getUrlParams2 } from '/@/utils';
   import { wechatBinding } from '/@/api';
   import { useUserStore } from '/@/store/modules/user';
 
+  const router = useRouter();
   const userStore = useUserStore();
 
   onMounted(async () => {
@@ -20,11 +22,18 @@
     if (code) {
       const res = await wechatBinding({ code });
 
-      const { token, status } = res.data.value || {};
+      const { token, status, mobile } = res.data.value || {};
+
+      // 未认证
+      if (!mobile) {
+        await router.push('/agentRegister');
+        return;
+      }
+
       token && userStore.setToken(token);
 
       userStore.setInfo({
-        mobile: '',
+        mobile,
         status: status === 'BIND_MOBILE',
       });
     }

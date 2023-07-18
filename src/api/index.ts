@@ -4,10 +4,9 @@ import useAxiosApi from '/@/utils/useAxiosApi';
  * 代理产品列表
  * @returns UseAxiosReturn
  */
-export function agentProductList(data) {
+export function agentProductList() {
   return useAxiosApi(`/rpt/agent/api/v1/productList`, {
     method: 'POST',
-    data,
   });
 }
 
@@ -36,10 +35,9 @@ export function agentReportList() {
  * 我的收益
  * @returns UseAxiosReturn
  */
-export function agentIncome(params) {
+export function agentIncome() {
   return useAxiosApi(`/rpt/agent/api/v1/income`, {
     method: 'GET',
-    params,
   });
 }
 

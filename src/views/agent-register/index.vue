@@ -58,13 +58,10 @@
   import { showToast } from 'vant';
   import { getSmsCode, agentLoginBySms, agentStatus } from '/@/api';
   import { useUserStore } from '/@/store/modules/user';
-  import { getUrlParams2 } from '/@/utils';
   import CustomerService from '/@/components/CustomerService.vue';
   import Protocol from '/@/components/protocol.vue';
 
   const userStore = useUserStore();
-  const { agentNo = '' } = getUrlParams2(window.location.href);
-  sessionStorage.setItem('agentNo', agentNo);
 
   const router = useRouter();
   const userName = ref('');
@@ -130,8 +127,7 @@
         mobile,
         status: statusRes.data.value === 'BIND_MOBILE',
       });
-      const agentNoStr = sessionStorage.getItem('agentNo');
-      await router.push(`/agentProduct?agentNo=${agentNoStr}`);
+      await router.push(`/agentProduct`);
     });
   };
 

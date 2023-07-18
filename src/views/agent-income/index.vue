@@ -53,9 +53,7 @@
   });
 
   const getIncome = () => {
-    agentIncome({
-      agentNo: sessionStorage.getItem('agentNo'),
-    }).then((res) => {
+    agentIncome().then((res) => {
       console.log(res.data.value);
       incomeInfo.value = res.data.value;
     });

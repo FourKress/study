@@ -5,7 +5,7 @@
         <van-icon name="manager" size="48" color="#D1D1D1" />
       </div>
       <div class="info">
-        <span class="name">{{  status ? useInfo.agentName : '游客' }}</span>
+        <span class="name">{{ status ? useInfo.agentName : '游客' }}</span>
         <span class="phone" v-if="status">{{ useInfo.mobile }}</span>
       </div>
 
@@ -69,9 +69,9 @@
   });
 
   const getMyInfo = () => {
+    if (!mobile) return;
     agentMy({
       mobile,
-      openId: '',
     }).then((res) => {
       useInfo.value = res.data.value;
     });

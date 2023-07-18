@@ -42,8 +42,6 @@
   import QRCode from 'qrcode';
   import { agentProductList, agentUpdateProduct, agentPromoLink } from '/@/api';
 
-  const agentNo = sessionStorage.getItem('agentNo');
-
   let show = ref(false);
   let showQrcode = ref(false);
   let productList = ref([]);
@@ -56,9 +54,7 @@
   });
 
   const getProductList = () => {
-    agentProductList({
-      agentNo,
-    }).then((res) => {
+    agentProductList().then((res) => {
       productList.value = res.data.value;
     });
   };

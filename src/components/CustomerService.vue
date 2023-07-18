@@ -3,7 +3,13 @@
     <span @click.stop="handleQrCode">
       <slot></slot>
     </span>
-    <van-dialog title="客服二维码" teleport="body" v-model:show="showQrcode" @confirm="handleCloseQrCode">
+    <van-dialog
+      title="客服二维码"
+      teleport="body"
+      v-model:show="showQrcode"
+      :show-confirm-button="showConfirmBtn"
+      @confirm="handleCloseQrCode"
+    >
       <div class="qrcode-container">
         <img class="img" :src="qrcodeInfo.qrcode" />
         <p class="mobile">电话: {{ qrcodeInfo.mobile }}</p>
@@ -27,6 +33,7 @@
     () => props?.isOpen,
     (val = {}) => {
       if (val) {
+        showConfirmBtn.value = false;
         handleQrCode();
       }
     },
@@ -34,6 +41,7 @@
 
   let showQrcode = ref(false);
   const qrcodeInfo = ref({});
+  const showConfirmBtn = ref(true);
 
   const handleCloseQrCode = () => {
     showQrcode.value = false;
