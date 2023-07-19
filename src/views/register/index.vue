@@ -72,7 +72,9 @@
     <van-action-sheet v-model:show="visiblePay" :title="`支付金额: ${amt}`">
       <div class="pay-content">
         <div class="row" v-for="pay in payList" :key="pay.key" :class="selectPay === pay.key && 'active'" @click="handleSelectPay(pay)">
-          <div class="icon"></div>
+          <div class="icon">
+            <img :src="pay.icon" alt="" />
+          </div>
           <div class="label">{{ pay.label }}</div>
         </div>
         <van-button type="primary" block :disabled="!selectPay" @click="handlePay">立即支付</van-button>
@@ -132,7 +134,6 @@
   const protocolType = ref('');
   const agentName = ref('');
   const agentMobile = ref('');
-  const payData = ref({});
   const showPayQrcode = ref(false);
 
   sessionStorage.setItem('agentNo', agentNo);
@@ -147,9 +148,14 @@
 
   const payList = [
     {
-      key: 'wechat',
+      key: 'WECHAT_PAY',
       label: '微信支付',
-      icon: ',',
+      icon: new URL('../../assets/wechat.png', import.meta.url).href,
+    },
+    {
+      key: 'ALI_PAY',
+      label: '支付宝支付',
+      icon: new URL('../../assets/aliPay.png', import.meta.url).href,
     },
   ];
 
@@ -198,45 +204,10 @@
       showToast('请先阅读并同意勾选协议');
       return;
     }
-    const { idNo, mobile, userName, smsCode } = values;
+    const { mobile, userName, smsCode } = values;
 
     if (isRegister.value) {
-      showLoadingToast({
-        message: '加载中...',
-        forbidClick: true,
-        duration: 0,
-      });
-      custReport({
-        agentNo,
-        productCode,
-        custName: userName,
-        idNo,
-        mobile,
-        smsKey: smsKey.value,
-        smsCode,
-        payChannel: 'WECHAT_PAY',
-        orderAmt: amt.value,
-        terminal: judgeClient(),
-      }).then((res) => {
-        payData.value = res?.data?.value;
-        showPayQrcode.value = true;
-        QRCode.toCanvas(document.querySelector('.qrcode'), payData.value.payUrl, function (error) {
-          if (error) console.error(error);
-          console.log('success!');
-          closeToast();
-
-          setTimeout(() => {
-            custApplyDetail({
-              paySerialNo: payData.value.paySerialNo,
-            }).then((result) => {
-              if (result.data.value?.status) {
-                router.push('/order');
-              }
-            });
-          }, 3000);
-        });
-        // visiblePay.value = true;
-      });
+      visiblePay.value = true;
     } else {
       custLoginBySms({
         smsKey: smsKey.value,
@@ -299,8 +270,45 @@
   };
 
   const handlePay = () => {
-    // router.push(`/order`);
-    // const { payUrl } = payData.value;
+    showLoadingToast({
+      message: '加载中...',
+      forbidClick: true,
+      duration: 0,
+    });
+    custReport({
+      agentNo,
+      productCode,
+      custName: userName.value,
+      idNo: idNo.value,
+      mobile: mobile.value,
+      smsKey: smsKey.value,
+      smsCode: smsCode.value,
+      payChannel: selectPay.value,
+      orderAmt: amt.value,
+      terminal: judgeClient(),
+    }).then((res) => {
+      const payData = res?.data?.value;
+      if (selectPay.value === 'WECHAT_PAY') {
+        QRCode.toCanvas(document.querySelector('.qrcode'), payData.payUrl, function (error) {
+          if (error) console.error(error);
+          console.log('success!');
+          closeToast();
+
+          setTimeout(() => {
+            custApplyDetail({
+              paySerialNo: payData.paySerialNo,
+            }).then((result) => {
+              if (result.data.value?.status) {
+                router.push('/order');
+              }
+            });
+          }, 3000);
+        });
+      } else {
+        sessionStorage.setItem('aliPayForm', payData.payUrl);
+        router.push(`/aliPay`);
+      }
+    });
   };
 
   const openProtocol = async (type) => {
@@ -497,7 +505,12 @@
       .icon {
         width: 71px;
         height: 71px;
-        background: #333;
+
+        img {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
       }
 
       .label {

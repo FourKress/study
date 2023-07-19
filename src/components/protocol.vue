@@ -39,7 +39,6 @@
     () => props.protocolType,
     (val = {}) => {
       if (!val) return;
-        console.log(props.name)
       if (val === 'customer') {
         protocolTitle.value = '用户协议';
         protocolData.value = customerProtocolData;
