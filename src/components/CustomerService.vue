@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup name="CustomerService">
-  import { ref, defineProps, watch } from 'vue';
+  import { ref, watch } from 'vue';
   import { customerService } from '/@/api';
 
   const props = defineProps({

@@ -14,7 +14,7 @@
     apply.value = form;
 
     nextTick(() => {
-      document.forms[O].submit();
+      document.forms[0]?.submit();
     });
   });
 </script>

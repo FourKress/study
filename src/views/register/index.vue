@@ -207,6 +207,7 @@
     const { mobile, userName, smsCode } = values;
 
     if (isRegister.value) {
+      selectPay.value = '';
       visiblePay.value = true;
     } else {
       custLoginBySms({
@@ -305,6 +306,7 @@
           }, 3000);
         });
       } else {
+        closeToast();
         sessionStorage.setItem('aliPayForm', payData.payUrl);
         router.push(`/aliPay`);
       }
