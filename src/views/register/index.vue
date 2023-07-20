@@ -91,17 +91,19 @@
     />
 
     <div v-show="showPayQrcode">
-      <van-dialog title="微信支付二维码" :show="true" show-cancel-button :show-confirm-button="false">
+      <van-dialog title="微信支付二维码" :show="true" show-cancel-button :show-confirm-button="false" @cancel="handlePayCancel">
         <div class="qrcode-container">
           <canvas class="img qrcode"></canvas>
         </div>
       </van-dialog>
     </div>
+
+    <div v-html="applyForm"></div>
   </div>
 </template>
 
 <script lang="ts" setup name="RegisterPage">
-  import { ref } from 'vue';
+  import { nextTick, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { showToast, showLoadingToast, closeToast } from 'vant';
   import Advertising from '/@/components/Advertising.vue';
@@ -135,6 +137,8 @@
   const agentName = ref('');
   const agentMobile = ref('');
   const showPayQrcode = ref(false);
+  const applyForm = ref('');
+  const payTimer = ref(0);
 
   sessionStorage.setItem('agentNo', agentNo);
   sessionStorage.setItem('productCode', productCode);
@@ -288,14 +292,17 @@
       orderAmt: amt.value,
       terminal: judgeClient(),
     }).then((res) => {
+      handleLogin(res);
       const payData = res?.data?.value;
       if (selectPay.value === 'WECHAT_PAY') {
+        showPayQrcode.value = true;
         QRCode.toCanvas(document.querySelector('.qrcode'), payData.payUrl, function (error) {
           if (error) console.error(error);
           console.log('success!');
+          visiblePay.value = false;
           closeToast();
 
-          setTimeout(() => {
+          payTimer.value = setInterval(() => {
             custApplyDetail({
               paySerialNo: payData.paySerialNo,
             }).then((result) => {
@@ -306,9 +313,11 @@
           }, 3000);
         });
       } else {
-        closeToast();
-        sessionStorage.setItem('aliPayForm', payData.payUrl);
-        router.push(`/aliPay`);
+        applyForm.value = payData.payUrl;
+        nextTick(() => {
+          closeToast();
+          document.forms[1]?.submit();
+        });
       }
     });
   };
@@ -328,6 +337,15 @@
     } else {
       showToast('请先输入姓名、身份证号、手机号');
     }
+  };
+
+  const handlePayCancel = () => {
+    idNo.value = '';
+    userName.value = '';
+    mobile.value = '';
+    smsCode.value = '';
+    showPayQrcode.value = false;
+    payTimer.value && clearInterval(payTimer.value);
   };
 </script>
 

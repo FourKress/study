@@ -49,7 +49,6 @@
   let modifyProduct = ref({});
 
   onMounted(() => {
-    if (!agentNo) return;
     getProductList();
   });
 
@@ -73,7 +72,6 @@
   const handleModifyAmt = () => {
     if (!productAmt.value) return;
     agentUpdateProduct({
-      agentNo,
       productCode: modifyProduct.value.productCode,
       agentAmt: productAmt.value,
     }).then(() => {

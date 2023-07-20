@@ -88,7 +88,7 @@ export const routes = [
           title: '报告详情',
           notNavbar: false,
         },
-      }
+      },
     ],
   },
   {
@@ -100,11 +100,6 @@ export const routes = [
     path: '/agentRegister',
     name: 'AgentRegister',
     component: () => import('/@/views/agent-register/index.vue'),
-  },
-  {
-    path: '/aliPay',
-    name: 'AliPay',
-    component: () => import('/@/views/ali-pay/index.vue'),
   },
 
   // 匹配不到重定向会主页
