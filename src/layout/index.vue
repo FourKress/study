@@ -19,7 +19,7 @@
           <router-view />
         </div>
       </div>
-      <CustomerService :isOpen="open">
+      <CustomerService :isOpen="open" v-show="open">
         <van-icon size="20" name="service" color="#fff" />
       </CustomerService>
     </div>
