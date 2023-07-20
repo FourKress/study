@@ -307,6 +307,7 @@
               paySerialNo: payData.paySerialNo,
             }).then((result) => {
               if (result.data.value?.applyStatus === 'SUCCESS') {
+                clearInterval(payTimer.value);
                 router.push('/order');
               }
             });
