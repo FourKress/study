@@ -306,7 +306,7 @@
             custApplyDetail({
               paySerialNo: payData.paySerialNo,
             }).then((result) => {
-              if (result.data.value?.applyStatus) {
+              if (result.data.value?.applyStatus === 'SUCCESS') {
                 router.push('/order');
               }
             });
