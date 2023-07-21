@@ -30,7 +30,7 @@
 
     <div v-show="showQrcode">
       <van-dialog title="产品二维码" :show="true" @confirm="handleCloseQrCode">
-        <canvas class="qrcode"></canvas>
+        <img class="qrcode" :src="qrCodeUrl" />
       </van-dialog>
     </div>
   </div>
@@ -47,6 +47,7 @@
   let productList = ref([]);
   let productAmt = ref(0);
   let modifyProduct = ref({});
+  const qrCodeUrl = ref('');
 
   onMounted(() => {
     getProductList();
@@ -90,9 +91,9 @@
       productCode: product.productCode,
     }).then((res) => {
       showQrcode.value = true;
-      QRCode.toCanvas(document.querySelector('.qrcode'), res.data.value, function (error) {
+      QRCode.toDataURL(res.data.value, function (error, url) {
         if (error) console.error(error);
-        console.log('success!');
+        qrCodeUrl.value = url;
       });
     });
   };
@@ -119,7 +120,7 @@
   };
 
   const handleCheckExample = () => {
-      window.open('http://rpt.quchaq.com/profile/qucha/open/demo.pdf');
+    window.open('http://rpt.quchaq.com/profile/qucha/open/demo.pdf');
   };
 </script>
 

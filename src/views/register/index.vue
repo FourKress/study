@@ -93,7 +93,7 @@
     <div v-show="showPayQrcode">
       <van-dialog title="微信支付二维码" :show="true" show-cancel-button :show-confirm-button="false" @cancel="handlePayCancel">
         <div class="qrcode-container">
-          <canvas class="img qrcode"></canvas>
+          <img class="img" :src="payQrCodeUrl" />
         </div>
       </van-dialog>
     </div>
@@ -139,6 +139,7 @@
   const showPayQrcode = ref(false);
   const applyForm = ref('');
   const payTimer = ref(0);
+  const payQrCodeUrl = ref('')
 
   sessionStorage.setItem('agentNo', agentNo);
   sessionStorage.setItem('productCode', productCode);
@@ -296,9 +297,9 @@
       const payData = res?.data?.value;
       if (selectPay.value === 'WECHAT_PAY') {
         showPayQrcode.value = true;
-        QRCode.toCanvas(document.querySelector('.qrcode'), payData.payUrl, function (error) {
+        QRCode.toDataURL(payData.payUrl, function (error, url) {
           if (error) console.error(error);
-          console.log('success!');
+          payQrCodeUrl.value = url;
           visiblePay.value = false;
           closeToast();
 
