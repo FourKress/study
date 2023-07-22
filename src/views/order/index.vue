@@ -25,9 +25,7 @@
         <span class="amount">¥{{ item.payAmt }}</span>
       </div>
       <div class="footer">
-        <div class="btn" v-if="item.applyStatus === 'SUCCESS' && item.share === 'Y'" @click.stop="handleSendAgent(item)"
-          >发送代理商</div
-        >
+        <div class="btn" v-if="item.applyStatus === 'SUCCESS' && item.share === 'Y'" @click.stop="handleSendAgent(item)">发送代理商</div>
         <div class="btn" v-if="item.applyStatus === 'SUCCESS'" @click.stop="handleDownload(item)">下载</div>
 
         <div class="btn" v-if="item.applyStatus === 'FAILURE'"> <CustomerService>联系客服</CustomerService></div>
@@ -126,7 +124,9 @@
   };
 
   const handleCheckDetails = (order) => {
-    router.push(`/reportDetails?paySerialNo=${order.paySerialNo}`);
+    if (order.applyStatus === 'SUCCESS') {
+      router.push(`/reportDetails?paySerialNo=${order.paySerialNo}`);
+    }
   };
 </script>
 
