@@ -20,7 +20,7 @@
       </div>
       <div class="footer">
         <div class="btn" @click="handleQrCode(item)">二维码</div>
-        <div class="btn" @click="handleCopy(item)">复制链接</div>
+        <div class="btn" :id="`copy-btn_${item.productCode}`" :data-clipboard-text="copyText" @click="handleCopy(item)">复制链接</div>
       </div>
     </div>
 
@@ -40,6 +40,7 @@
   import { onMounted, ref } from 'vue';
   import { showToast } from 'vant';
   import QRCode from 'qrcode';
+  import Clipboard from 'clipboard';
   import { agentProductList, agentUpdateProduct, agentPromoLink } from '/@/api';
 
   let show = ref(false);
@@ -48,6 +49,7 @@
   let productAmt = ref(0);
   let modifyProduct = ref({});
   const qrCodeUrl = ref('');
+  const copyText = ref('');
 
   onMounted(() => {
     getProductList();
@@ -87,6 +89,10 @@
   };
 
   const handleQrCode = (product) => {
+    if (!product.agentAmt) {
+      showToast('请先设置代理销售价格');
+      return;
+    }
     agentPromoLink({
       productCode: product.productCode,
     }).then((res) => {
@@ -103,19 +109,18 @@
   };
 
   const handleCopy = (product) => {
+    if (!product.agentAmt) {
+      showToast('请先设置代理销售价格');
+      return;
+    }
     agentPromoLink({
       productCode: product.productCode,
-    }).then((res) => {
-      const input = document.createElement('input');
-      input.setAttribute('readonly', 'readonly');
-      input.setAttribute('value', res.data.value);
-      document.body.appendChild(input);
-      input.setSelectionRange(0, 9999);
-      if (document.execCommand('copy')) {
-        document.execCommand('copy');
-        showToast('已复制');
-      }
-      document.body.removeChild(input);
+    }).then(async (res) => {
+      copyText.value = res.data.value;
+      const clipBoard = new Clipboard(`#copy-btn_${product.productCode}`);
+      clipBoard.on('success', () => {
+        showToast('复制成功');
+      });
     });
   };
 

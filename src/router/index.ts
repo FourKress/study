@@ -28,7 +28,9 @@ router.beforeEach(async (_to, _from, next) => {
     if (!token && code) {
       const res = await wechatBinding({ code });
 
-      const { token, status, mobile } = res.data.value || {};
+      const { token, status, mobile, openId } = res.data.value || {};
+
+      sessionStorage.setItem('tempKey', openId);
 
       // 未认证
       if (!mobile) {

@@ -112,11 +112,14 @@
       return;
     }
     const { mobile, userName, smsCode } = values;
+    const openId = sessionStorage.getItem('tempKey');
+
     agentLoginBySms({
       mobile,
       userName,
       smsCode,
       smsKey: smsKey.value,
+      openId,
     }).then(async (res) => {
       const data = res?.data?.value;
       const { token } = data;
