@@ -1,7 +1,7 @@
 export const routes = [
   {
-    path: '/home',
-    name: 'Home',
+    path: '/agentHome',
+    name: 'agentHome',
     component: () => import('/@/layout/index.vue'),
     meta: {
       hasTabbar: false,
