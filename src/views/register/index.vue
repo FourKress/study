@@ -139,7 +139,7 @@
   const showPayQrcode = ref(false);
   const applyForm = ref('');
   const payTimer = ref(0);
-  const payQrCodeUrl = ref('')
+  const payQrCodeUrl = ref('');
 
   sessionStorage.setItem('agentNo', agentNo);
   sessionStorage.setItem('productCode', productCode);
@@ -276,6 +276,18 @@
   };
 
   const handlePay = () => {
+    // @ts-ignore
+    if (useragent.match(/MicroMessenger/i) != 'MicroMessenger') {
+      if (selectPay.value === 'WECHAT_PAY') {
+        showToast('要使用微信支付请在微信浏览器中打开该链接后进行支付');
+        return;
+      }
+    } else {
+      if (selectPay.value === 'ALI_PAY') {
+        showToast('要使用支付宝支付请在浏览器中打开该链接后进行支付');
+        return;
+      }
+    }
     showLoadingToast({
       message: '加载中...',
       forbidClick: true,
