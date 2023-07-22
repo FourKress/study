@@ -11,8 +11,8 @@
       </div>
       <div class="info">
         <div class="row">
-          <span class="label">订单号: {{item.paySerialNo}}</span>
-          <span class="text">{{ item.orderNo }}</span>
+          <span class="label">订单号: </span>
+          <span class="text">{{ item.paySerialNo }}</span>
         </div>
         <div class="row">
           <span class="label">客户:</span>
@@ -62,12 +62,12 @@
     background-color: rgba(245, 245, 245, 1);
 
     .item {
-      height: 344px;
+      height: 244px;
       border-radius: 20px;
       background: rgba(255, 255, 255, 1);
       box-sizing: border-box;
       padding: 28px 36px 0;
-      margin-bottom: 60px;
+      margin-bottom: 46px;
 
       &:last-child {
         margin-bottom: 0;
