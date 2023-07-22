@@ -276,6 +276,7 @@
   };
 
   const handlePay = () => {
+    const useragent = navigator.userAgent;
     // @ts-ignore
     if (useragent.match(/MicroMessenger/i) != 'MicroMessenger') {
       if (selectPay.value === 'WECHAT_PAY') {
