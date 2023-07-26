@@ -13,13 +13,18 @@ router.beforeEach(async (_to, _from, next) => {
   const userStore = useUserStore();
   const { path } = _to;
   if (path.includes('agent')) {
-    const useragent = navigator.userAgent;
-    // @ts-ignore
-    if (useragent.match(/MicroMessenger/i) != 'MicroMessenger') {
-      window.location.href = `${process.env.NODE_ENV === 'production' ? '' : '/public'}/wxError.html`;
-      return;
+    // const useragent = navigator.userAgent;
+    // // @ts-ignore
+    // if (useragent.match(/MicroMessenger/i) != 'MicroMessenger') {
+    //   window.location.href = `${process.env.NODE_ENV === 'production' ? '' : '/public'}/wxError.html`;
+    //   return;
+    // }
+    // if (['/agentHome', '/agentRegister'].includes(path)) return next();
+
+    if (!location.href.includes('/#/')) {
+      const href = `${location.origin}/#/${location.href.split('#/')[1]}${location.search}`;
+      return window.location.replace(href);
     }
-    if (['/agentHome', '/agentRegister'].includes(path)) return next();
 
     const appUser = userStore.info;
     const { code = '' } = getUrlParams2(window.location.href);

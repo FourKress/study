@@ -2,17 +2,7 @@
   <router-view />
 </template>
 
-<script setup lang="ts">
-  import { onMounted } from 'vue';
-
-  onMounted(async () => {
-    if (!location.href.includes('/#/')) {
-      const href = `${location.origin}/#/${location.href.split('#/')[1]}${location.search}`;
-      window.location.replace(href);
-      return;
-    }
-  });
-</script>
+<script setup lang="ts"></script>
 
 <style>
   #app {
