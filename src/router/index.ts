@@ -31,7 +31,7 @@ router.beforeEach(async (_to, _from, next) => {
 
       const isBind = status === 'BIND_MOBILE';
       // 未认证
-      if (!mobile && isBind) {
+      if (!mobile || !isBind) {
         return next('/agentRegister');
       }
       token && userStore.setToken(token);
