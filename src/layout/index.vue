@@ -2,7 +2,7 @@
   <div class="layout">
     <van-nav-bar placeholder left-arrow v-if="!notNavbar" @click-left="onClickLeft">
       <template #left>
-        <van-icon size="20" color="#fff" name="arrow-left" />
+        <van-icon size="20" color="#fff" name="arrow-left" v-if="!hasTabbar" />
       </template>
       <template #title>
         <span class="nav-title">{{ title }}</span>

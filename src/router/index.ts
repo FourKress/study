@@ -20,11 +20,11 @@ router.beforeEach(async (_to, _from, next) => {
       return;
     }
 
-    if (['/agentHome', '/agentRegister'].includes(path)) return next();
     if (!location.href.includes('/#/')) {
       const href = `${location.origin}/#/${location.href.split('#/')[1]}${location.search}`;
       return window.location.replace(href);
     }
+    if (['/agentHome', '/agentRegister'].includes(path)) return next();
 
     const appUser = userStore.info;
     const { code = '' } = getUrlParams2(window.location.href);
