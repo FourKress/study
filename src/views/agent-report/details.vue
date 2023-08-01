@@ -9,13 +9,13 @@
         <span>评分解读</span>
       </div>
       <div class="score_tab">
-        <div class="score_tab_div" style="color: rgb(255, 106, 0)"><div>0 ~ 20</div><div>极差</div></div
-        ><div class="score_tab_div" style="color: rgb(82, 168, 255)"><div>20 ~ 40</div><div>较差</div></div
+        <div class="score_tab_div" style="color: rgb(255, 106, 0)"><div>0 ~ 20</div><div>优秀</div></div
+        ><div class="score_tab_div" style="color: rgb(82, 168, 255)"><div>20 ~ 40</div><div>良好</div></div
         ><div class="score_tab_div" style="color: rgb(82, 168, 255)"><div>40 ~ 60</div><div>一般</div></div
-        ><div class="score_tab_div" style="color: rgb(82, 168, 255)"><div>60 ~ 80</div><div>良好</div></div
-        ><div class="score_tab_div" style="color: rgb(82, 168, 255)"><div>80 ~ 100</div><div>优秀</div></div></div
+        ><div class="score_tab_div" style="color: rgb(82, 168, 255)"><div>60 ~ 80</div><div>较差</div></div
+        ><div class="score_tab_div" style="color: rgb(82, 168, 255)"><div>80 ~ 100</div><div>极差</div></div></div
       ><div class="score_p"
-        >评分仅供参考，分数越低信用越好0（通过）80（拒绝）0&lt值&lt80（复议）。本报告包含身
+        >评分仅供参考，分数越低信用越好0-20（通过）20&lt值&lt80（审核）80-100（拒绝）。本报告包含身
         份校验、借贷风险、失信等多个维度，是根据网络行为综合评估的，不包含个人隐私爬虫数据。</div
       ></div
     >
