@@ -16,6 +16,7 @@ export default function ({ command, mode }: ConfigEnv): UserConfig {
 
   return {
     root,
+    base: '/study/',
     resolve: {
       alias: [
         // /@/xxxx => src/xxxx
