@@ -1,5 +1,5 @@
 import { createVitePlugins } from './build/vite/plugins';
-import proxyConfig from "./build/vite/proxy";
+import proxyConfig from './build/vite/proxy';
 import { resolve } from 'path';
 import { ConfigEnv, loadEnv, UserConfig } from 'vite';
 import { wrapperEnv } from './build/utils';
@@ -32,6 +32,7 @@ export default function ({ command, mode }: ConfigEnv): UserConfig {
       ],
     },
     server: {
+      port: 2222,
       host: true,
       hmr: true,
       proxy: proxyConfig,

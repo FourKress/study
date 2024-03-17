@@ -33,19 +33,18 @@
   const maxNum = ref('10');
 
   const handleCompute = () => {
-    // const type = Math.round(Math.random() * 10000) % 2;
-    const type = 1;
+    const type = Math.round(Math.random() * 10000) % 2;
     calcType.value = type;
     const max = parseInt(maxNum.value);
 
     if ([15, 20].includes(max)) {
       if (type) {
         firstItem.value = Math.round(Math.random() * (max - 2)) + 1;
-        const secondItemValue = secondItem.value = Math.round(Math.random() * (max - firstItem.value - 1)) + 1;
+        const secondItemValue = (secondItem.value = Math.round(Math.random() * (max - firstItem.value - 1)) + 1);
         if (firstItem.value < max - 5) {
-          secondItem.value = Math.max(secondItemValue, max-4-firstItem.value);
+          secondItem.value = Math.max(secondItemValue, max - 4 - firstItem.value);
         } else {
-           secondItem.value = Math.round(Math.random() * (max - firstItem.value - 1)) + 1;
+          secondItem.value = Math.round(Math.random() * (max - firstItem.value - 1)) + 1;
         }
       } else {
         firstItem.value = Math.max(Math.round(Math.random() * (max - 2)) + 2, max - 4);
@@ -79,62 +78,62 @@
 </script>
 
 <style>
-#app {
-  width: 100vw;
-  height: 100%;
-  box-sizing: border-box;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  position: fixed;
-  overflow: hidden;
-}
-
-.container {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .input {
-    width: 100%;
-    position: absolute;
-    left: 0;
-    top: 10px;
+  #app {
+    width: 100vw;
+    height: 100%;
+    box-sizing: border-box;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
+    position: fixed;
+    overflow: hidden;
   }
 
-  .text {
-    font-size: 214px;
-    text-align: center;
-    padding-top: 100px;
-  }
-}
+  .container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-.van-field {
-  padding: 0 !important;
+    .input {
+      width: 100%;
+      position: absolute;
+      left: 0;
+      top: 10px;
+    }
 
-  .van-button {
-    width: 120px;
-  }
-}
-
-@media only screen and (min-width: 1366px) {
-  .input {
-    top: 0 !important;
-  }
-  .van-radio__icon,
-  .van-field__button {
-    transform-origin: center;
-    transform: scale(0.5);
+    .text {
+      font-size: 214px;
+      text-align: center;
+      padding-top: 100px;
+    }
   }
 
-  .van-radio__label {
-    margin-left: 0 !important;
+  .van-field {
+    padding: 0 !important;
+
+    .van-button {
+      width: 120px;
+    }
   }
 
-  .van-radio-group {
-    transform: translateY(-10px);
+  @media only screen and (min-width: 1366px) {
+    .input {
+      top: 0 !important;
+    }
+    .van-radio__icon,
+    .van-field__button {
+      transform-origin: center;
+      transform: scale(0.5);
+    }
+
+    .van-radio__label {
+      margin-left: 0 !important;
+    }
+
+    .van-radio-group {
+      transform: translateY(-10px);
+    }
   }
-}
 </style>
