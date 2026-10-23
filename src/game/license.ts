@@ -19,12 +19,16 @@ export interface LicenseStatus {
   message: string;
   features: Feature[];
   exp: number | null;
+  instantUntil: number | null;
+  instantUsed: boolean;
 }
 
 const SEEN_KEY = 'suan-suan-license-seen';
 const DB_NAME = 'suan-suan-license';
 const STORE = 'device';
+const INSTANT_KEY = 'instant';
 const CLOCK_SKEW_MS = 120_000;
+const INSTANT_MS = 60 * 60 * 1000;
 
 interface StoredDevice {
   alg: 'Ed25519' | 'P-256';
@@ -60,7 +64,7 @@ export async function checkLicense(): Promise<LicenseStatus> {
     const url = new URL(`licenses.json?t=${Date.now()}`, new URL(import.meta.env.BASE_URL, window.location.href));
     response = await fetch(url, { cache: 'no-store' });
   } catch {
-    return status('offline', deviceId, '暂时连不上。有网时再点重新检查。');
+    return finish(status('offline', deviceId, '暂时连不上。有网时再点重新检查。'));
   }
   if (!response.ok) return status('invalid', deviceId, '授权没有通过。加作者微信处理。');
 
@@ -99,7 +103,7 @@ export async function checkLicense(): Promise<LicenseStatus> {
 
   const record = (payload.devices as Record<string, SignedDevice>)[deviceId];
   if (!record || typeof record.exp !== 'number') {
-    return status('missing', deviceId, '这台设备还未授权。复制下面的设备码，加作者微信发给他。弄好之后再点重新检查。');
+    return finish(status('missing', deviceId, '这台设备还未授权。复制下面的设备码，加作者微信发给他。弄好之后再点重新检查。'));
   }
   if (record.exp < Math.floor(Date.now() / 1000)) {
     return status(
@@ -121,14 +125,42 @@ export function formatLicenseDate(exp: number) {
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
+export function formatLicenseTime(ms: number) {
+  const date = new Date(ms);
+  const hours = `${date.getHours()}`.padStart(2, '0');
+  const minutes = `${date.getMinutes()}`.padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+export async function startInstantUse() {
+  const existing = await readInstantUntil();
+  if (existing) return false;
+  await writeInstantUntil(Date.now() + INSTANT_MS);
+  return true;
+}
+
+async function finish(result: LicenseStatus): Promise<LicenseStatus> {
+  if (result.state !== 'missing' && result.state !== 'offline') return result;
+  const until = await readInstantUntil();
+  if (until && until > Date.now()) {
+    if (!acceptClock()) return status('clock', result.deviceId, '这台设备的时间不对。把时间改回正确后再点重新检查。');
+    return status('ready', result.deviceId, '', [...FEATURES], null, until);
+  }
+  if (result.state === 'missing' && typeof until === 'number') {
+    return { ...result, instantUsed: true };
+  }
+  return result;
+}
+
 function status(
   state: LicenseState,
   deviceId: string,
   message: string,
   features: Feature[] = [],
   exp: number | null = null,
+  instantUntil: number | null = null,
 ): LicenseStatus {
-  return { state, deviceId, message, features, exp };
+  return { state, deviceId, message, features, exp, instantUntil, instantUsed: false };
 }
 
 function isFeature(value: string): value is Feature {
@@ -244,6 +276,42 @@ function idbGet(db: IDBDatabase) {
 function idbPut(db: IDBDatabase, device: StoredDevice) {
   return new Promise<void>((resolve, reject) => {
     const request = db.transaction(STORE, 'readwrite').objectStore(STORE).put(device, 'current');
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function readInstantUntil() {
+  if (!globalThis.indexedDB) return null;
+  const db = await openDb();
+  try {
+    const value = await idbGetRaw(db, INSTANT_KEY);
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  } finally {
+    db.close();
+  }
+}
+
+async function writeInstantUntil(until: number) {
+  const db = await openDb();
+  try {
+    await idbPutRaw(db, INSTANT_KEY, until);
+  } finally {
+    db.close();
+  }
+}
+
+function idbGetRaw(db: IDBDatabase, key: string) {
+  return new Promise<unknown>((resolve, reject) => {
+    const request = db.transaction(STORE, 'readonly').objectStore(STORE).get(key);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function idbPutRaw(db: IDBDatabase, key: string, value: number) {
+  return new Promise<void>((resolve, reject) => {
+    const request = db.transaction(STORE, 'readwrite').objectStore(STORE).put(value, key);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
   });

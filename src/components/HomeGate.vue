@@ -1,15 +1,17 @@
 <script setup lang="ts">
   import { computed } from 'vue';
   import Mascot from './Mascot.vue';
-  import { formatLicenseDate, type Feature } from '../game/license';
+  import { formatLicenseDate, formatLicenseTime, type Feature } from '../game/license';
   import { save, toggleSound } from '../game/storage';
 
   const props = defineProps<{
     features: Feature[];
     expiresAt: number | null;
+    instantUntil: number | null;
   }>();
 
   const expiresLabel = computed(() => (props.expiresAt ? formatLicenseDate(props.expiresAt) : ''));
+  const instantLabel = computed(() => (props.instantUntil ? formatLicenseTime(props.instantUntil) : ''));
 
   const emit = defineEmits<{
     map: [];
@@ -30,7 +32,8 @@
       <div class="title-block">
         <p class="eyebrow">挑一种玩法</p>
         <h1>豆豆口算</h1>
-        <p v-if="expiresLabel" class="stats">授权到 {{ expiresLabel }}</p>
+        <p v-if="instantLabel" class="stats">可使用到 {{ instantLabel }}</p>
+        <p v-else-if="expiresLabel" class="stats">授权到 {{ expiresLabel }}</p>
       </div>
       <div class="top-tools">
         <button class="icon-btn" type="button" :aria-pressed="save.sound" @click="toggleSound">

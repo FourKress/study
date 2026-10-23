@@ -9,10 +9,12 @@
     message: string;
     busy: boolean;
     state: LicenseState;
+    instantUsed: boolean;
   }>();
 
   const emit = defineEmits<{
     retry: [];
+    hour: [];
   }>();
 
   const copied = ref(false);
@@ -25,6 +27,8 @@
     if (props.state === 'expired') return '联系作者授权';
     return '联系作者';
   });
+
+  const canHour = computed(() => props.state === 'missing' && !props.instantUsed && !props.busy);
 
   async function copy() {
     if (!props.deviceId) return;
@@ -64,6 +68,7 @@
         <p>{{ message }}</p>
         <p class="license-key" @click="copy">{{ deviceId || '正在读取这台设备' }}</p>
         <div class="license-actions">
+          <button v-if="canHour" class="primary" type="button" @click="emit('hour')">立即试用一小时</button>
           <button class="primary" type="button" :disabled="!deviceId" @click="copy">
             {{ copied ? '已复制' : '复制设备码' }}
           </button>
