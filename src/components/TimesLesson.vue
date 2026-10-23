@@ -1,6 +1,8 @@
 <script setup lang="ts">
-  import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+  import { computed, onBeforeUnmount, ref, watch } from 'vue';
   import Mascot from './Mascot.vue';
+  import { holdMusicForSpeech, speak, stopSpeak } from '../game/sound';
+  import { save } from '../game/storage';
 
   const props = defineProps<{ a: number; b: number }>();
   const emit = defineEmits<{ close: [] }>();
@@ -29,7 +31,8 @@
 
   const mode = ref<Mode>(props.a * props.b <= 30 ? 'dots' : 'split');
   const step = ref(0);
-  let timer = 0;
+  const playing = ref(mode.value !== 'near');
+  let waitTimer = 0;
 
   const part = computed(() => pieces(props.a, props.b));
   const product = computed(() => props.a * props.b);
@@ -113,44 +116,51 @@
     height: `${((20 - props.b) / 20) * 100}%`,
   }));
 
-  function stop() {
-    window.clearInterval(timer);
-    timer = 0;
+  function clearWait() {
+    window.clearTimeout(waitTimer);
+    waitTimer = 0;
   }
 
-  function play() {
-    stop();
-    if (mode.value === 'near') return;
+  function queueAuto(didSpeak: boolean) {
+    if (!playing.value || mode.value === 'near') return;
     if (step.value >= stepCount.value - 1) return;
-    timer = window.setInterval(() => {
-      if (step.value >= stepCount.value - 1) {
-        stop();
-        return;
-      }
+    waitTimer = window.setTimeout(() => {
+      if (!playing.value || mode.value === 'near') return;
+      if (step.value >= stepCount.value - 1) return;
       step.value += 1;
-    }, 2600);
+    }, didSpeak ? 450 : 2600);
+  }
+
+  function sayStep() {
+    clearWait();
+    speak(caption.value, queueAuto);
   }
 
   function next() {
-    stop();
+    playing.value = false;
+    clearWait();
     if (step.value < stepCount.value - 1) step.value += 1;
   }
 
   function replay() {
-    step.value = 0;
-    play();
+    playing.value = mode.value !== 'near';
+    clearWait();
+    if (step.value === 0) sayStep();
+    else step.value = 0;
   }
 
   function openNear() {
-    stop();
+    playing.value = false;
+    clearWait();
     mode.value = 'near';
     step.value = 0;
   }
 
   function backMain() {
+    playing.value = true;
+    clearWait();
     mode.value = props.a * props.b <= 30 ? 'dots' : 'split';
     step.value = 0;
-    play();
   }
 
   function dotDelay(r: number, c: number) {
@@ -159,10 +169,23 @@
     return { animationDelay: `${Math.min(index, 24) * 55}ms` };
   }
 
-  onMounted(play);
+  watch(caption, sayStep, { immediate: true });
+
+  watch(
+    () => save.sound,
+    (on) => {
+      if (!on) stopSpeak();
+    },
+  );
+
+  holdMusicForSpeech(true);
+
   onBeforeUnmount(() => {
+    playing.value = false;
+    clearWait();
+    stopSpeak();
+    holdMusicForSpeech(false);
     wideQuery?.removeEventListener('change', onWideChange);
-    stop();
   });
 </script>
 

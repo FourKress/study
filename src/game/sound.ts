@@ -10,8 +10,92 @@ function getContext() {
   return context;
 }
 
+let speechHold = false;
+let speechToken = 0;
+let speechPrimed = false;
+let zhVoice: SpeechSynthesisVoice | null = null;
+
+function speechEngine() {
+  return typeof window === 'undefined' ? null : window.speechSynthesis ?? null;
+}
+
+function loadZhVoice() {
+  const synth = speechEngine();
+  if (!synth) return;
+  const voices = synth.getVoices();
+  zhVoice =
+    voices.find((voice) => voice.lang === 'zh-CN' || voice.lang === 'zh_CN') ??
+    voices.find((voice) => voice.lang.toLowerCase().startsWith('zh')) ??
+    null;
+}
+
+function primeSpeech() {
+  const synth = speechEngine();
+  if (!synth || speechPrimed) return;
+  speechPrimed = true;
+  loadZhVoice();
+  synth.addEventListener('voiceschanged', loadZhVoice);
+  const primer = new SpeechSynthesisUtterance('嗯');
+  primer.lang = 'zh-CN';
+  primer.volume = 0;
+  synth.speak(primer);
+}
+
+function toSpoken(text: string) {
+  return text
+    .replace(/×/g, '乘')
+    .replace(/＝|=/g, '等于')
+    .replace(/＋/g, '加')
+    .replace(/－/g, '减')
+    .replace(/：/g, '，')
+    .replace(/行/g, '航')
+    .replace(/\s+/g, '');
+}
+
+export function stopSpeak() {
+  speechToken += 1;
+  speechEngine()?.cancel();
+}
+
+export function speak(text: string, onDone?: (didSpeak: boolean) => void) {
+  const synth = speechEngine();
+  const mine = ++speechToken;
+  if (!save.sound || !text || !synth) {
+    onDone?.(false);
+    return;
+  }
+  loadZhVoice();
+  synth.cancel();
+  const utter = new SpeechSynthesisUtterance(toSpoken(text));
+  utter.lang = 'zh-CN';
+  utter.rate = 0.9;
+  utter.pitch = 1.05;
+  if (zhVoice) utter.voice = zhVoice;
+  const finish = (didSpeak: boolean) => {
+    if (mine !== speechToken) return;
+    onDone?.(didSpeak);
+  };
+  utter.onend = () => finish(true);
+  utter.onerror = () => finish(false);
+  window.setTimeout(() => {
+    if (mine !== speechToken) return;
+    try {
+      synth.speak(utter);
+    } catch {
+      finish(false);
+    }
+  }, 40);
+}
+
+export function holdMusicForSpeech(hold: boolean) {
+  speechHold = hold;
+  if (hold) stopMusic();
+  else if (save.sound) startMusic();
+}
+
 export function unlockAudio() {
   if (!save.sound) return;
+  primeSpeech();
   try {
     const ctx = getContext();
     if (!ctx) return;
@@ -77,7 +161,7 @@ export function stopMusic() {
 }
 
 export function startMusic() {
-  if (!save.sound || musicOn) return;
+  if (!save.sound || musicOn || speechHold) return;
   const ctx = getContext();
   if (!ctx) return;
   if (ctx.state === 'suspended') void ctx.resume();
