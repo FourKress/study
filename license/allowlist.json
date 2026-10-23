@@ -1,4 +1,9 @@
 {
   "v": 1,
-  "devices": {}
+  "devices": {
+    "ed25519.rvhUceUCsMeIXxqibBZBWxdA6fBP5cUxakt7B2VhfJs": {
+      "exp": 1824249600,
+      "feat": ["timed", "free", "map", "table"]
+    }
+  }
 }
