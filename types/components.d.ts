@@ -10,6 +10,7 @@ declare module 'vue' {
     FreePlay: typeof import('./../src/components/FreePlay.vue')['default']
     HomeGate: typeof import('./../src/components/HomeGate.vue')['default']
     IslandMap: typeof import('./../src/components/IslandMap.vue')['default']
+    LicenseGate: typeof import('./../src/components/LicenseGate.vue')['default']
     Mascot: typeof import('./../src/components/Mascot.vue')['default']
     PlayStage: typeof import('./../src/components/PlayStage.vue')['default']
     ResultStage: typeof import('./../src/components/ResultStage.vue')['default']

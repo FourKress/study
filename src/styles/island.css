@@ -396,6 +396,44 @@ h1 {
   margin: 28px auto 0;
 }
 
+.door:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.door:disabled:active {
+  transform: none;
+}
+
+.license-sheet {
+  width: min(100%, 520px);
+  text-align: left;
+}
+
+.license-key {
+  padding: 12px;
+  border-radius: 16px;
+  background: #fff;
+  color: #3c3356;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-all;
+  user-select: all;
+}
+
+.license-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.license-actions .primary,
+.license-actions .ghost {
+  min-height: 52px;
+  font-size: 18px;
+}
+
 .door-mark {
   background: #d9f4ff;
 }

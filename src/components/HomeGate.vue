@@ -1,6 +1,11 @@
 <script setup lang="ts">
   import Mascot from './Mascot.vue';
+  import type { Feature } from '../game/license';
   import { save, toggleSound } from '../game/storage';
+
+  const props = defineProps<{
+    features: Feature[];
+  }>();
 
   const emit = defineEmits<{
     map: [];
@@ -8,6 +13,10 @@
     timed: [];
     table: [];
   }>();
+
+  function open(feature: Feature) {
+    return props.features.includes(feature);
+  }
 </script>
 
 <template>
@@ -26,32 +35,32 @@
     </header>
 
     <div class="door-list">
-      <button class="free-card door" type="button" @click="emit('timed')">
+      <button class="free-card door" type="button" :disabled="!open('timed')" @click="emit('timed')">
         <span class="free-mark door-mark time">时</span>
         <span>
           <strong>计时练</strong>
-          <small>看算式，心里算，时间到了换下一题</small>
+          <small>{{ open('timed') ? '看算式，心里算，时间到了换下一题' : '这份授权还没包含' }}</small>
         </span>
       </button>
-      <button class="free-card door" type="button" @click="emit('free')">
+      <button class="free-card door" type="button" :disabled="!open('free')" @click="emit('free')">
         <span class="free-mark door-mark">自</span>
         <span>
           <strong>自由练</strong>
-          <small>自己搭配加减乘除</small>
+          <small>{{ open('free') ? '自己搭配加减乘除' : '这份授权还没包含' }}</small>
         </span>
       </button>
-      <button class="free-card door" type="button" @click="emit('map')">
+      <button class="free-card door" type="button" :disabled="!open('map')" @click="emit('map')">
         <span class="free-mark door-mark play">关</span>
         <span>
           <strong>闯关练</strong>
-          <small>一关一关收集贴纸</small>
+          <small>{{ open('map') ? '一关一关收集贴纸' : '这份授权还没包含' }}</small>
         </span>
       </button>
-      <button class="free-card door" type="button" @click="emit('table')">
+      <button class="free-card door" type="button" :disabled="!open('table')" @click="emit('table')">
         <span class="free-mark door-mark times">乘</span>
         <span>
           <strong>乘法表</strong>
-          <small>看几行几列怎样变成一个数</small>
+          <small>{{ open('table') ? '看几行几列怎样变成一个数' : '这份授权还没包含' }}</small>
         </span>
       </button>
     </div>

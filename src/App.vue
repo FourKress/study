@@ -2,11 +2,13 @@
   import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
   import World from './components/World.vue';
   import HomeGate from './components/HomeGate.vue';
+  import LicenseGate from './components/LicenseGate.vue';
   import IslandMap from './components/IslandMap.vue';
   import FreePlay from './components/FreePlay.vue';
   import PlayStage from './components/PlayStage.vue';
   import ResultStage from './components/ResultStage.vue';
   import TimesTable from './components/TimesTable.vue';
+  import { checkLicense, FEATURES, type Feature, type LicenseStatus } from './game/license';
   import { levels, toConfig } from './game/levels';
   import { markClear, save } from './game/storage';
   import { setMusicLayer, startMusic, stopMusic, unlockAudio } from './game/sound';
@@ -24,6 +26,12 @@
   }
 
   const screen = ref<Screen>('home');
+  const license = ref<LicenseStatus>(
+    import.meta.env.DEV && !import.meta.env.VITE_LICENSE_PUBLIC_KEY
+      ? { state: 'ready', deviceId: '', message: '', features: [...FEATURES] }
+      : { state: 'loading', deviceId: '', message: '正在检查授权', features: [] },
+  );
+  let licenseTask: Promise<void> | null = null;
   const sky = ref<Sky>('clear');
   const config = ref<QuizConfig | null>(null);
   const levelId = ref<string | null>(null);
@@ -34,7 +42,44 @@
 
   const level = computed(() => levels.find((item) => item.id === levelId.value) ?? null);
 
-  function begin(id: string | null, nextConfig: QuizConfig) {
+  function refreshLicense() {
+    if (licenseTask) return licenseTask;
+    if (license.value.state !== 'ready') {
+      license.value = { ...license.value, state: 'loading', message: '正在检查授权' };
+    }
+    licenseTask = checkLicense()
+      .then((next) => {
+        license.value = next;
+      })
+      .catch(() => {
+        license.value = {
+          state: 'offline',
+          deviceId: license.value.deviceId,
+          message: '连不上授权名单。有网时再点重新检查。',
+          features: [],
+        };
+      })
+      .finally(() => {
+        licenseTask = null;
+      });
+    return licenseTask;
+  }
+
+  async function ensure(feature: Feature) {
+    await refreshLicense();
+    const allowed = license.value.state === 'ready' && license.value.features.includes(feature);
+    if (!allowed) screen.value = 'home';
+    return allowed;
+  }
+
+  async function enter(feature: Feature) {
+    if (!(await ensure(feature))) return;
+    screen.value = feature;
+  }
+
+  async function begin(id: string | null, nextConfig: QuizConfig) {
+    const feature: Feature = id ? 'map' : nextConfig.endless ? 'timed' : 'free';
+    if (!(await ensure(feature))) return;
     levelId.value = id;
     config.value = nextConfig;
     playKey.value += 1;
@@ -65,17 +110,19 @@
     drops.value = sky.value === 'rain' ? 32 : 0;
   }
 
-  function leavePlay() {
-    if (levelId.value) screen.value = 'map';
-    else if (config.value?.endless) screen.value = 'timed';
-    else screen.value = 'free';
+  async function leavePlay() {
+    const feature: Feature = levelId.value ? 'map' : config.value?.endless ? 'timed' : 'free';
+    if (!(await ensure(feature))) return;
+    screen.value = feature;
   }
 
-  function replay() {
+  async function replay() {
     if (!config.value) {
       screen.value = 'home';
       return;
     }
+    const feature: Feature = levelId.value ? 'map' : config.value.endless ? 'timed' : 'free';
+    if (!(await ensure(feature))) return;
     playKey.value += 1;
     screen.value = 'play';
   }
@@ -84,10 +131,18 @@
     const index = levels.findIndex((item) => item.id === levelId.value);
     const next = levels[index + 1];
     if (!next) {
-      screen.value = 'map';
+      leavePlay();
       return;
     }
     begin(next.id, toConfig(next));
+  }
+
+  function leaveResult() {
+    if (levelId.value) {
+      leavePlay();
+      return;
+    }
+    screen.value = 'home';
   }
 
   function onWeather(next: Sky, count = 0) {
@@ -103,6 +158,7 @@
   }
 
   watch(screen, (value) => {
+    if (value === 'home') refreshLicense();
     if (value === 'play') {
       sky.value = 'clear';
       drops.value = 0;
@@ -125,7 +181,10 @@
     },
   );
 
-  onMounted(() => window.addEventListener('pointerdown', unlock));
+  onMounted(() => {
+    refreshLicense();
+    window.addEventListener('pointerdown', unlock);
+  });
   onBeforeUnmount(() => {
     window.removeEventListener('pointerdown', unlock);
     stopMusic();
@@ -135,12 +194,20 @@
 <template>
   <World :sky="sky" :bolt-key="boltKey" :drops="drops">
     <Transition name="fade" mode="out-in">
+      <LicenseGate
+        v-if="screen === 'home' && license.state !== 'ready'"
+        :device-id="license.deviceId"
+        :message="license.message"
+        :busy="license.state === 'loading'"
+        @retry="refreshLicense"
+      />
       <HomeGate
-        v-if="screen === 'home'"
-        @map="screen = 'map'"
-        @free="screen = 'free'"
-        @timed="screen = 'timed'"
-        @table="screen = 'table'"
+        v-else-if="screen === 'home'"
+        :features="license.features"
+        @map="enter('map')"
+        @free="enter('free')"
+        @timed="enter('timed')"
+        @table="enter('table')"
       />
       <TimesTable v-else-if="screen === 'table'" @back="screen = 'home'" />
       <IslandMap v-else-if="screen === 'map'" @back="screen = 'home'" @start="begin($event.id, $event.config)" />
@@ -167,7 +234,7 @@
         :has-next="summary.hasNext"
         @again="replay"
         @next="nextLevel"
-        @home="screen = levelId ? 'map' : 'home'"
+        @home="leaveResult"
       />
     </Transition>
   </World>

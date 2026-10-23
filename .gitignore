@@ -24,3 +24,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# License signing outputs. The private key stays in .env.local or Actions Secrets.
+public/licenses.json
+src/generated/
