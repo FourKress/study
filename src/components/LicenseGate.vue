@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import Mascot from './Mascot.vue';
+  import authorWechat from '../assets/author-wechat.jpg';
 
   const props = defineProps<{
     deviceId: string;
@@ -13,6 +14,7 @@
   }>();
 
   const copied = ref(false);
+  const showWechat = ref(false);
   let copyTimer = 0;
 
   async function copy() {
@@ -44,7 +46,7 @@
       <Mascot mood="idle" size="sm" />
       <div class="title-block">
         <p class="eyebrow">{{ busy ? '请稍等' : '请家长看这里' }}</p>
-        <h1>{{ busy ? '正在检查' : '还没授权' }}</h1>
+        <h1>{{ busy ? '正在检查' : '还未授权' }}</h1>
       </div>
     </header>
 
@@ -59,7 +61,14 @@
           <button class="ghost" type="button" :disabled="busy" @click="emit('retry')">
             {{ busy ? '正在检查' : '重新检查' }}
           </button>
+          <button class="ghost" type="button" @click="showWechat = !showWechat">
+            {{ showWechat ? '收起二维码' : '联系作者' }}
+          </button>
         </div>
+        <figure v-if="showWechat" class="license-qr">
+          <img :src="authorWechat" alt="作者微信二维码" />
+          <figcaption>扫码加作者微信</figcaption>
+        </figure>
       </div>
     </div>
   </section>

@@ -48,29 +48,29 @@ export async function checkLicense(): Promise<LicenseStatus> {
   try {
     deviceId = await loadDeviceId();
   } catch (error) {
-    const message = error instanceof DeviceStoreError ? error.message : '这个浏览器存不下设备密钥。换一个浏览器打开。';
+    const message = error instanceof DeviceStoreError ? error.message : '这个浏览器记不住这台设备。换一个浏览器打开。';
     return status('invalid', '', message);
   }
 
-  if (!publicKey) return status('unconfigured', deviceId, '这个页面没有带上授权公钥。');
+  if (!publicKey) return status('unconfigured', deviceId, '授权还没准备好。加作者微信处理。');
 
   let response: Response;
   try {
     const url = new URL(`licenses.json?t=${Date.now()}`, new URL(import.meta.env.BASE_URL, window.location.href));
     response = await fetch(url, { cache: 'no-store' });
   } catch {
-    return status('offline', deviceId, '连不上授权名单。有网时再点重新检查。');
+    return status('offline', deviceId, '暂时连不上。有网时再点重新检查。');
   }
-  if (!response.ok) return status('invalid', deviceId, '没有找到授权名单。');
+  if (!response.ok) return status('invalid', deviceId, '授权没有通过。加作者微信处理。');
 
   let body: { payload?: unknown; sig?: unknown };
   try {
     body = await response.json();
   } catch {
-    return status('invalid', deviceId, '授权名单的签名对不上。');
+    return status('invalid', deviceId, '授权没有通过。加作者微信处理。');
   }
   if (typeof body.payload !== 'string' || typeof body.sig !== 'string') {
-    return status('invalid', deviceId, '授权名单的签名对不上。');
+    return status('invalid', deviceId, '授权没有通过。加作者微信处理。');
   }
 
   let signed = false;
@@ -83,27 +83,27 @@ export async function checkLicense(): Promise<LicenseStatus> {
   } catch {
     signed = false;
   }
-  if (!signed) return status('invalid', deviceId, '授权名单的签名对不上。');
-  if (!acceptClock()) return status('clock', deviceId, '这台设备的时间被往回改过。');
+  if (!signed) return status('invalid', deviceId, '授权没有通过。加作者微信处理。');
+  if (!acceptClock()) return status('clock', deviceId, '这台设备的时间不对。把时间改回正确后再点重新检查。');
 
   let payload: { v?: unknown; devices?: unknown };
   try {
     payload = JSON.parse(body.payload) as { v?: unknown; devices?: unknown };
   } catch {
-    return status('invalid', deviceId, '授权名单的签名对不上。');
+    return status('invalid', deviceId, '授权没有通过。加作者微信处理。');
   }
   if (payload.v !== 1 || !payload.devices || typeof payload.devices !== 'object' || Array.isArray(payload.devices)) {
-    return status('invalid', deviceId, '授权名单的签名对不上。');
+    return status('invalid', deviceId, '授权没有通过。加作者微信处理。');
   }
 
   const record = (payload.devices as Record<string, SignedDevice>)[deviceId];
   if (!record || typeof record.exp !== 'number') {
-    return status('missing', deviceId, '名单里还没有这台设备。把设备码原样发给作者，不要加空格。发布之后再点重新检查。');
+    return status('missing', deviceId, '这台设备还未授权。复制下面的设备码，加作者微信发给他。弄好之后再点重新检查。');
   }
-  if (record.exp < Math.floor(Date.now() / 1000)) return status('expired', deviceId, '这台设备的授权到期了。');
+  if (record.exp < Math.floor(Date.now() / 1000)) return status('expired', deviceId, '这台设备的授权到期了。加作者微信续上。');
 
   const features = Array.isArray(record.feat) ? record.feat.filter(isFeature) : [];
-  if (!features.length) return status('invalid', deviceId, '这份授权没有开放玩法。');
+  if (!features.length) return status('invalid', deviceId, '这份授权还没开放玩法。加作者微信处理。');
   return status('ready', deviceId, '', features);
 }
 
@@ -129,7 +129,7 @@ function acceptClock() {
 
 async function loadDeviceId() {
   if (!globalThis.crypto?.subtle || !globalThis.indexedDB) {
-    throw new DeviceStoreError('这个浏览器存不下设备密钥。换一个浏览器打开。');
+    throw new DeviceStoreError('这个浏览器记不住这台设备。换一个浏览器打开。');
   }
   const db = await openDb();
   try {
@@ -139,7 +139,7 @@ async function loadDeviceId() {
       stored = await createPair();
       await idbPut(db, stored);
       if (!(await holdsPrivateKey(stored))) {
-        throw new DeviceStoreError('这个浏览器存不下设备密钥。换一个浏览器打开。');
+        throw new DeviceStoreError('这个浏览器记不住这台设备。换一个浏览器打开。');
       }
     }
     return await publicId(stored);

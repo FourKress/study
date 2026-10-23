@@ -55,7 +55,7 @@
         license.value = {
           state: 'offline',
           deviceId: license.value.deviceId,
-          message: '连不上授权名单。有网时再点重新检查。',
+          message: '暂时连不上。有网时再点重新检查。',
           features: [],
         };
       })
