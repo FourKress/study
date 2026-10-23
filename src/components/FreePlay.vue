@@ -12,8 +12,11 @@
     start: [config: QuizConfig];
   }>();
 
+  const presetSizes = [5, 10, 15, 20];
   const ops = ref<Op[]>(['add']);
-  const max = ref(10);
+  const rangeMode = ref<'preset' | 'custom'>('preset');
+  const presetMax = ref(10);
+  const customMax = ref('30');
   const table = ref<'easy' | 'hard' | 'all'>('easy');
   const count = ref(12);
   const seconds = ref(8);
@@ -26,7 +29,12 @@
     { id: 'div', label: '除法', symbol: '÷' },
   ];
 
-  const needsRange = computed(() => ops.value.includes('add') || ops.value.includes('sub'));
+  const regroupChoices: { id: Op; label: string; symbol: string }[] = [
+    { id: 'carryAdd', label: '进位加法', symbol: '进' },
+    { id: 'borrow', label: '退位减法', symbol: '退' },
+  ];
+
+  const needsRange = computed(() => ops.value.some((op) => op === 'add' || op === 'sub' || op === 'carryAdd' || op === 'borrow'));
   const needsTable = computed(() => ops.value.includes('mul') || ops.value.includes('div'));
 
   function toggle(op: Op) {
@@ -43,7 +51,39 @@
     tip.value = '';
   }
 
+  function selectPreset(size: number) {
+    rangeMode.value = 'preset';
+    presetMax.value = size;
+    tip.value = '';
+  }
+
+  function selectCustom() {
+    rangeMode.value = 'custom';
+    tip.value = '';
+  }
+
+  function currentMax() {
+    if (!needsRange.value || rangeMode.value === 'preset') return presetMax.value;
+    const raw = customMax.value.trim();
+    if (!/^\d+$/.test(raw)) return null;
+    const value = Number(raw);
+    if (value < 1 || value > 999) return null;
+    return value;
+  }
+
   function begin() {
+    const max = currentMax();
+    if (max === null) {
+      tip.value = '范围要在 1 到 999 之间';
+      return;
+    }
+    const regroup = ops.value.filter((op) => op === 'carryAdd' || op === 'borrow');
+    if (regroup.length && max < 10) {
+      const names = regroupChoices.filter((item) => regroup.includes(item.id)).map((item) => item.label);
+      tip.value = `${names.join('和')}的运算范围至少要到 10`;
+      return;
+    }
+
     const tables =
       table.value === 'hard'
         ? { factorMin: 6, factorMax: 9, otherMin: 1, otherMax: 9 }
@@ -53,7 +93,7 @@
 
     emit('start', {
       ops: [...ops.value],
-      max: max.value,
+      max,
       ...tables,
       count: props.timed ? 0 : count.value,
       seconds: seconds.value,
@@ -74,7 +114,7 @@
     </header>
 
     <div class="panel">
-      <h2>运算</h2>
+      <h2>运算方法</h2>
       <div class="symbol-row">
         <button
           v-for="item in opChoices"
@@ -88,15 +128,40 @@
           <span>{{ item.label }}</span>
         </button>
       </div>
+      <div class="regroup-row">
+        <button
+          v-for="item in regroupChoices"
+          :key="item.id"
+          type="button"
+          class="symbol-key"
+          :class="[item.id, { on: ops.includes(item.id) }]"
+          @click="toggle(item.id)"
+        >
+          <b>{{ item.symbol }}</b>
+          <span>{{ item.label }}</span>
+        </button>
+      </div>
       <p v-if="tip" class="inline-tip">{{ tip }}</p>
 
       <template v-if="needsRange">
-        <h2>加减范围</h2>
+        <h2>运算范围</h2>
         <div class="chips">
-          <button v-for="size in [5, 10, 15, 20]" :key="size" type="button" class="chip" :class="{ on: max === size }" @click="max = size">
+          <button
+            v-for="size in presetSizes"
+            :key="size"
+            type="button"
+            class="chip"
+            :class="{ on: rangeMode === 'preset' && presetMax === size }"
+            @click="selectPreset(size)"
+          >
             {{ size }} 以内
           </button>
+          <button type="button" class="chip" :class="{ on: rangeMode === 'custom' }" @click="selectCustom">自定义</button>
         </div>
+        <label v-if="rangeMode === 'custom'" class="range-custom">
+          <input v-model="customMax" type="text" inputmode="numeric" maxlength="3" aria-label="自定义运算范围" @input="tip = ''" />
+          <span>以内</span>
+        </label>
       </template>
 
       <template v-if="needsTable">

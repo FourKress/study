@@ -1,4 +1,4 @@
-export type Op = 'add' | 'sub' | 'mul' | 'div';
+export type Op = 'add' | 'sub' | 'mul' | 'div' | 'carryAdd' | 'borrow';
 
 export type Mood = 'idle' | 'think' | 'worry' | 'cheer' | 'oops' | 'sulk' | 'win';
 

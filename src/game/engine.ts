@@ -1,6 +1,6 @@
 import type { Op, Question, QuizConfig } from './types';
 
-const SYMBOL: Record<Op, string> = {
+const SYMBOL: Record<Exclude<Op, 'carryAdd' | 'borrow'>, string> = {
   add: '＋',
   sub: '－',
   mul: '×',
@@ -53,6 +53,44 @@ function makeDiv(config: QuizConfig) {
   return { a: quotient * divisor, b: divisor, answer: quotient };
 }
 
+function makeCarryAdd(max: number) {
+  if (max <= 20) {
+    const sum = rand(10, Math.min(max, 18));
+    const a = rand(Math.max(1, sum - 9), Math.min(9, sum - 1));
+    return { a, b: sum - a, answer: sum, op: 'add' as const };
+  }
+
+  const onesA = rand(1, 9);
+  const onesB = rand(10 - onesA, 9);
+  const onesResult = onesA + onesB - 10;
+  const highSum = rand(0, Math.floor((max - onesResult) / 10) - 1);
+  const highA = rand(0, highSum);
+  const highB = highSum - highA;
+  const a = highA * 10 + onesA;
+  const b = highB * 10 + onesB;
+  return { a, b, answer: a + b, op: 'add' as const };
+}
+
+function makeBorrowSub(max: number) {
+  if (max <= 20) {
+    const choices: number[] = [];
+    for (let value = 10; value <= max; value += 1) {
+      if (value % 10 <= 8) choices.push(value);
+    }
+    const a = choices[rand(0, choices.length - 1)];
+    const b = rand((a % 10) + 1, 9);
+    return { a, b, answer: a - b, op: 'sub' as const };
+  }
+
+  const onesB = rand(1, 9);
+  const onesA = rand(0, onesB - 1);
+  const highA = rand(1, Math.floor((max - onesA) / 10));
+  const highB = rand(0, highA - 1);
+  const a = highA * 10 + onesA;
+  const b = highB * 10 + onesB;
+  return { a, b, answer: a - b, op: 'sub' as const };
+}
+
 export function makeOptions(answer: number) {
   const picked = new Set<number>([answer]);
   const nearby = shuffle([1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 10, -10]);
@@ -73,6 +111,18 @@ export function makeOptions(answer: number) {
 export function makeQuestion(config: QuizConfig): Question {
   const ops = config.ops.length ? config.ops : (['add'] as Op[]);
   const op = ops[rand(0, ops.length - 1)];
+  if (op === 'carryAdd' || op === 'borrow') {
+    const built = op === 'carryAdd' ? makeCarryAdd(config.max) : makeBorrowSub(config.max);
+    return {
+      a: built.a,
+      b: built.b,
+      answer: built.answer,
+      op: built.op,
+      prompt: `${built.a} ${SYMBOL[built.op]} ${built.b}`,
+      options: makeOptions(built.answer),
+    };
+  }
+
   const built =
     op === 'add' ? makeAdd(config.max) : op === 'sub' ? makeSub(config.max) : op === 'mul' ? makeMul(config) : makeDiv(config);
 

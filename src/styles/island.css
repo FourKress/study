@@ -836,6 +836,48 @@ h1 {
   box-shadow: 0 6px 0 #8ed68a;
 }
 
+.regroup-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.symbol-key.carryAdd.on {
+  background: #ffd7bf;
+  box-shadow: 0 6px 0 #e7b08a;
+}
+
+.symbol-key.borrow.on {
+  background: #e4d4ff;
+  box-shadow: 0 6px 0 #cbb6ea;
+}
+
+.range-custom {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.range-custom input {
+  width: 128px;
+  min-height: 64px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 5px 0 rgba(80, 60, 40, 0.1);
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  color: inherit;
+}
+
+.range-custom span {
+  font-size: 18px;
+}
+
 .play-screen {
   display: flex;
   flex-direction: column;
