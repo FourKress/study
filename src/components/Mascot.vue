@@ -75,7 +75,9 @@
           </g>
         </g>
         <ellipse class="nose" cx="118" cy="162" rx="9" ry="7" />
-        <path v-if="mood === 'oops'" class="mouth" d="M98 184q20-16 40 0" />
+        <path v-if="mood === 'sulk'" class="mouth" d="M94 188q24-24 48 0" />
+        <path v-else-if="mood === 'oops'" class="mouth" d="M98 184q20-16 40 0" />
+        <path v-else-if="mood === 'worry'" class="mouth" d="M100 178h36" />
         <path v-else-if="mood === 'cheer' || mood === 'win'" class="mouth joy" d="M94 170q24 28 48 0" />
         <path v-else class="mouth" d="M100 174q18 14 36 0" />
         <ellipse class="foot" cx="92" cy="202" rx="18" ry="10" :fill="`url(#${fur})`" />

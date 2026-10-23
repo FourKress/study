@@ -85,9 +85,10 @@ export function makeQuestion(config: QuizConfig): Question {
 }
 
 export function starsFor(firstTry: number, total: number) {
-  if (total <= 0) return 1;
-  const rate = firstTry / total;
-  if (rate >= 0.85) return 3;
-  if (rate >= 0.6) return 2;
-  return 1;
+  if (total <= 0) return 0;
+  const misses = total - firstTry;
+  if (misses <= total / 6) return 3;
+  if (misses <= total / 3) return 2;
+  if (misses <= total / 2) return 1;
+  return 0;
 }

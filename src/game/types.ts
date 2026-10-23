@@ -1,6 +1,6 @@
 export type Op = 'add' | 'sub' | 'mul' | 'div';
 
-export type Mood = 'idle' | 'think' | 'cheer' | 'oops' | 'win';
+export type Mood = 'idle' | 'think' | 'worry' | 'cheer' | 'oops' | 'sulk' | 'win';
 
 export interface QuizConfig {
   ops: Op[];
@@ -11,6 +11,7 @@ export interface QuizConfig {
   otherMax: number;
   count: number;
   seconds: number;
+  endless?: boolean;
 }
 
 export interface Question {

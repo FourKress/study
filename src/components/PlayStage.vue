@@ -13,6 +13,7 @@
   const emit = defineEmits<{
     finish: [result: RoundResult];
     quit: [];
+    weather: [sky: 'clear' | 'wind' | 'rain' | 'storm', drops: number];
   }>();
 
   const index = ref(0);
@@ -25,6 +26,8 @@
   const streak = ref(0);
   const leftMs = ref(props.config.seconds * 1000);
   const cooling = ref(false);
+  const points = ref(0);
+  const correctRun = ref(0);
   const bits = ref<{ id: number; x: number; y: number; dx: number; dy: number; rot: number; color: string; delay: number }[]>([]);
 
   const totalMs = computed(() => props.config.seconds * 1000);
@@ -35,16 +38,22 @@
   const mood = computed<Mood>(() => {
     if (phase.value === 'pause') return 'idle';
     if (revealReason.value === 'ok') return 'cheer';
-    if (revealReason.value === 'time' || wrong.value.length) return 'oops';
+    if (revealReason.value === 'time') return 'oops';
+    if (wrong.value.length >= 3) return 'sulk';
+    if (wrong.value.length === 2) return 'oops';
+    if (wrong.value.length === 1) return 'worry';
     return 'think';
   });
   const speech = computed(() => {
     if (phase.value === 'pause') return '休息一下';
+    if (props.config.endless) return '心里算一算';
     if (revealReason.value === 'ok' && streak.value >= 2) return '连对啦！';
     if (revealReason.value === 'ok' && !attempted.value) return '太棒了！';
     if (revealReason.value === 'ok') return '答对啦';
     if (revealReason.value === 'time') return '时间到啦';
-    if (wrong.value.length) return '再试一次';
+    if (wrong.value.length >= 3) return '这题有点难';
+    if (wrong.value.length === 2) return '看仔细';
+    if (wrong.value.length === 1) return '再试一次';
     return '点一个答案';
   });
 
@@ -70,6 +79,40 @@
     }
     last = now;
     frame = requestAnimationFrame(loop);
+  }
+
+  function skyNow() {
+    const tier = props.config.count / 6;
+    const point = points.value;
+    if (props.config.count >= 12 && point >= tier * 3) return 'storm' as const;
+    if (point >= tier * 2) return 'rain' as const;
+    if (point >= tier) return 'wind' as const;
+    return 'clear' as const;
+  }
+
+  function rainDrops() {
+    const rainAt = (props.config.count / 6) * 2;
+    if (points.value < rainAt) return 0;
+    return Math.min(64, 32 + (points.value - rainAt) * 8);
+  }
+
+  function publishSky() {
+    emit('weather', skyNow(), rainDrops());
+  }
+
+  function noteMiss() {
+    correctRun.value = 0;
+    points.value += 1;
+    publishSky();
+  }
+
+  function onSolved() {
+    correctRun.value += 1;
+    if (correctRun.value >= 2) {
+      correctRun.value = 0;
+      points.value = Math.max(0, points.value - props.config.count / 6);
+      publishSky();
+    }
   }
 
   function burst(x: number, y: number) {
@@ -114,8 +157,24 @@
     }, 600);
   }
 
+  function advance() {
+    index.value += 1;
+    question.value = makeQuestion(props.config);
+    wrong.value = [];
+    attempted.value = false;
+    cooling.value = false;
+    revealReason.value = null;
+    bits.value = [];
+    phase.value = 'play';
+    leftMs.value = totalMs.value;
+  }
+
   function onTimeout() {
     if (phase.value !== 'play') return;
+    if (props.config.endless) {
+      advance();
+      return;
+    }
     streak.value = 0;
     revealReason.value = 'time';
     phase.value = 'reveal';
@@ -125,12 +184,19 @@
 
   function next() {
     if (!alive) return;
+    if (props.config.endless) {
+      advance();
+      return;
+    }
+    if (revealReason.value === 'ok' && !attempted.value) onSolved();
+    else noteMiss();
     if (index.value + 1 >= props.config.count) {
-      playTone('win');
+      const stars = starsFor(firstTry.value, props.config.count);
+      if (stars > 0) playTone('win');
       emit('finish', {
         total: props.config.count,
         firstTry: firstTry.value,
-        stars: starsFor(firstTry.value, props.config.count),
+        stars,
       });
       return;
     }
@@ -159,7 +225,7 @@
       resume();
       return;
     }
-    if (phase.value !== 'play') return;
+    if (props.config.endless || phase.value !== 'play') return;
     const choice = Number(event.key);
     if (choice >= 1 && choice <= question.value.options.length) pick(question.value.options[choice - 1]);
   }
@@ -199,7 +265,8 @@
 
     <header class="play-bar">
       <button class="icon-btn" type="button" @click="phase = 'pause'">暂停</button>
-      <div class="progress" aria-hidden="true">
+      <p v-if="config.endless" class="round-count">第 {{ index + 1 }} 题</p>
+      <div v-else class="progress" aria-hidden="true">
         <i v-for="dot in config.count" :key="dot" :class="{ done: dot - 1 < index, now: dot - 1 === index }"></i>
       </div>
     </header>
@@ -218,10 +285,10 @@
           </svg>
           <span>{{ Math.ceil(leftMs / 1000) }}</span>
         </div>
-        <p class="round-name">{{ title }} · {{ index + 1 }}/{{ config.count }}</p>
+        <p class="round-name">{{ config.endless ? title : `${title} · ${index + 1}/${config.count}` }}</p>
         <p v-if="revealReason === 'ok' && streak >= 2" class="combo"><i>★</i> 连对 {{ streak }}</p>
         <h2 :key="index" class="prompt">{{ question.prompt }}</h2>
-        <div :key="`choices-${index}`" class="choices">
+        <div v-if="!config.endless" :key="`choices-${index}`" class="choices">
           <button
             v-for="(option, optionIndex) in question.options"
             :key="`${index}-${optionIndex}`"
@@ -237,7 +304,7 @@
             {{ option }}
           </button>
         </div>
-        <p class="key-hint">电脑上也可以按 1 2 3 4</p>
+        <p v-if="!config.endless" class="key-hint">电脑上也可以按 1 2 3 4</p>
       </div>
     </div>
 
@@ -247,8 +314,8 @@
           <Mascot mood="idle" size="sm" />
           <h3>暂停啦</h3>
           <button class="primary" type="button" @click="resume">继续</button>
-          <button class="ghost" type="button" @click="skip">跳过这题</button>
-          <button class="text-btn" type="button" @click="emit('quit')">回到小岛</button>
+          <button v-if="!config.endless" class="ghost" type="button" @click="skip">跳过这题</button>
+          <button class="text-btn" type="button" @click="emit('quit')">{{ title === '自由练' || config.endless ? '返回' : '回到小岛' }}</button>
         </div>
       </div>
     </Teleport>

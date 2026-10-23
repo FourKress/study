@@ -3,6 +3,10 @@
   import Mascot from './Mascot.vue';
   import type { Op, QuizConfig } from '../game/types';
 
+  const props = defineProps<{
+    timed?: boolean;
+  }>();
+
   const emit = defineEmits<{
     back: [];
     start: [config: QuizConfig];
@@ -11,7 +15,7 @@
   const ops = ref<Op[]>(['add']);
   const max = ref(10);
   const table = ref<'easy' | 'hard' | 'all'>('easy');
-  const count = ref(8);
+  const count = ref(12);
   const seconds = ref(8);
   const tip = ref('');
 
@@ -51,8 +55,9 @@
       ops: [...ops.value],
       max: max.value,
       ...tables,
-      count: count.value,
+      count: props.timed ? 0 : count.value,
       seconds: seconds.value,
+      endless: props.timed,
     });
   }
 </script>
@@ -62,8 +67,8 @@
     <header class="topbar">
       <button class="icon-btn" type="button" @click="emit('back')">返回</button>
       <div class="title-block">
-        <p class="eyebrow">自己出题</p>
-        <h1>自由练习</h1>
+        <p class="eyebrow">{{ timed ? '看算式，心里算' : '自己出题' }}</p>
+        <h1>{{ timed ? '计时练' : '自由练' }}</h1>
       </div>
       <Mascot mood="think" size="sm" />
     </header>
@@ -103,12 +108,14 @@
         </div>
       </template>
 
-      <h2>题数</h2>
-      <div class="chips">
-        <button v-for="size in [5, 8, 12]" :key="size" type="button" class="chip" :class="{ on: count === size }" @click="count = size">
-          {{ size }} 题
-        </button>
-      </div>
+      <template v-if="!timed">
+        <h2>题数</h2>
+        <div class="chips">
+          <button v-for="size in [6, 12, 18]" :key="size" type="button" class="chip" :class="{ on: count === size }" @click="count = size">
+            {{ size }} 题
+          </button>
+        </div>
+      </template>
 
       <h2>每题时间</h2>
       <div class="stepper">
@@ -120,7 +127,7 @@
         <button type="button" @click="seconds = Math.min(30, seconds + 1)">＋</button>
       </div>
 
-      <button class="primary" type="button" @click="begin">开始练习</button>
+      <button class="primary" type="button" @click="begin">{{ timed ? '开始计时' : '开始练习' }}</button>
     </div>
   </section>
 </template>

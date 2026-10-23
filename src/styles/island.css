@@ -33,6 +33,98 @@ button {
   height: 100dvh;
   overflow: hidden;
   background: linear-gradient(180deg, #79c8ff 0%, #d9f4ff 58%, #b7ec9a 100%);
+  transition: background 0.8s ease;
+}
+
+.world.sky-wind {
+  background: linear-gradient(180deg, #8eb7d8 0%, #d5e7f2 58%, #a9d68f 100%);
+}
+
+.world.sky-rain,
+.world.sky-storm {
+  background: linear-gradient(180deg, #6d86a3 0%, #c5d4e4 58%, #8eae86 100%);
+}
+
+.world.sky-wind .cloud {
+  animation-duration: 8s;
+}
+
+.world.sky-wind .sun {
+  opacity: 0.8;
+}
+
+.world.sky-wind .hill {
+  animation: sway 1.8s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+.rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.drop {
+  position: absolute;
+  top: -20px;
+  width: 2px;
+  height: 12px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.75);
+  --grow: 1.15;
+  animation: rain-fall 0.9s linear infinite;
+}
+
+.drop:nth-child(3n) {
+  height: 8px;
+  --grow: 0.65;
+  animation-duration: 1.15s;
+}
+
+.drop:nth-child(3n + 1) {
+  height: 16px;
+  --grow: 1.45;
+}
+
+.bolt {
+  position: absolute;
+  top: 18px;
+  left: 16%;
+  width: 78px;
+  height: 150px;
+  overflow: visible;
+  pointer-events: none;
+  transform-origin: top center;
+  animation: bolt-strike 0.45s ease both;
+}
+
+.bolt.flip {
+  transform: scaleX(-1);
+}
+
+.bolt-glow,
+.bolt-core,
+.bolt-branch {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.bolt-glow {
+  stroke: rgba(255, 244, 180, 0.9);
+  stroke-width: 12;
+}
+
+.bolt-core {
+  stroke: #fffef8;
+  stroke-width: 3;
+}
+
+.bolt-branch {
+  stroke: #fff3b0;
+  stroke-width: 2;
+  opacity: 0;
+  animation: bolt-branch 0.45s ease both;
 }
 
 .world-content {
@@ -237,6 +329,17 @@ h1 {
   color: #e06a8a;
 }
 
+.pocket-book {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  font-weight: 800;
+}
+
 .icon-btn,
 .primary,
 .ghost,
@@ -275,14 +378,34 @@ h1 {
   box-shadow: 0 8px 0 rgba(80, 60, 40, 0.08);
 }
 
-.free-card {
+.free-card,
+.door {
   display: flex;
   align-items: center;
   gap: 14px;
-  width: min(100%, 980px);
-  margin: 8px auto 18px;
+  width: min(100%, 520px);
+  margin: 0 auto;
   padding: 16px 18px;
   text-align: left;
+}
+
+.door-list {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 520px);
+  margin: 28px auto 0;
+}
+
+.door-mark {
+  background: #d9f4ff;
+}
+
+.door-mark.play {
+  background: #ffe08a;
+}
+
+.door-mark.time {
+  background: #ffd0e0;
 }
 
 .free-card strong,
@@ -416,6 +539,70 @@ h1 {
 
 .island-stars i.on {
   color: #f0a020;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.book-slot {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-height: 96px;
+  padding: 6px 4px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.book-slot:disabled {
+  filter: grayscale(0.8);
+  opacity: 0.7;
+}
+
+.book-slot .sticker-art {
+  width: 48px;
+}
+
+.book-fog {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e7eef2;
+  color: #8aa;
+  font-size: 14px;
+}
+
+.book-slot strong {
+  font-size: 12px;
+}
+
+.book-focus {
+  display: grid;
+  justify-items: center;
+  margin-top: 12px;
+}
+
+.book-focus .sticker-art {
+  width: 96px;
+}
+
+.book-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+@media (max-width: 520px) {
+  .book-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .path {
@@ -661,13 +848,15 @@ h1 {
 .progress {
   display: flex;
   flex: 1;
-  gap: 6px;
+  gap: 4px;
   justify-content: center;
+  min-width: 0;
 }
 
 .progress i {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
+  flex: none;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.7);
 }
@@ -680,6 +869,14 @@ h1 {
   transform: scale(1.3);
   background: #fff;
   box-shadow: 0 0 0 4px rgba(255, 177, 90, 0.45);
+}
+
+.round-count {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
 }
 
 .timer {
@@ -1076,8 +1273,24 @@ h1 {
   animation: win-hop 1.1s ease both;
 }
 
+.mascot.worry .actor {
+  animation: worry-tilt 0.5s ease forwards;
+}
+
 .mascot.oops .actor {
   animation: squat 0.55s ease forwards;
+}
+
+.mascot.sulk .actor {
+  animation: sulk 0.6s ease forwards;
+}
+
+.mascot.sulk .ear-l {
+  animation: ear-drop-l 0.45s ease forwards;
+}
+
+.mascot.sulk .ear-r {
+  animation: ear-drop-r 0.45s ease forwards;
 }
 
 .fade-enter-active,
@@ -1170,6 +1383,54 @@ h1 {
   }
 }
 
+@keyframes rain-fall {
+  from {
+    transform: translateY(0) scale(0.35);
+    opacity: 0.35;
+  }
+  to {
+    transform: translateY(100dvh) scale(var(--grow));
+    opacity: 0.9;
+  }
+}
+
+@keyframes bolt-strike {
+  0% {
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  32% {
+    opacity: 0.15;
+  }
+  46% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes bolt-branch {
+  0%,
+  30% {
+    opacity: 0;
+  }
+  46% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes sway {
+  50% {
+    transform: skewX(1.5deg);
+  }
+}
+
 @keyframes drift {
   from {
     transform: translateX(0);
@@ -1225,6 +1486,12 @@ h1 {
   }
 }
 
+@keyframes worry-tilt {
+  100% {
+    transform: rotate(-7deg);
+  }
+}
+
 @keyframes squat {
   0% {
     transform: scale(1, 1);
@@ -1234,6 +1501,36 @@ h1 {
   }
   100% {
     transform: translateY(6px) scale(1.04, 0.92);
+  }
+}
+
+@keyframes sulk {
+  0% {
+    transform: scale(1, 1);
+  }
+  35% {
+    transform: translateY(16px) scale(1.12, 0.78) rotate(-2deg);
+  }
+  55% {
+    transform: translateY(12px) scale(1.08, 0.84) rotate(2deg);
+  }
+  75% {
+    transform: translateY(15px) scale(1.1, 0.8) rotate(-1deg);
+  }
+  100% {
+    transform: translateY(12px) scale(1.08, 0.84);
+  }
+}
+
+@keyframes ear-drop-l {
+  100% {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes ear-drop-r {
+  100% {
+    transform: rotate(-16deg);
   }
 }
 

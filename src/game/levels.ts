@@ -14,7 +14,7 @@ export const levels: Level[] = [
     factorMax: 5,
     otherMin: 1,
     otherMax: 5,
-    count: 8,
+    count: 12,
     seconds: 10,
     },
   {
@@ -30,7 +30,7 @@ export const levels: Level[] = [
     factorMax: 5,
     otherMin: 1,
     otherMax: 5,
-    count: 8,
+    count: 12,
     seconds: 10,
   },
   {
@@ -46,7 +46,7 @@ export const levels: Level[] = [
     factorMax: 5,
     otherMin: 1,
     otherMax: 5,
-    count: 8,
+    count: 12,
     seconds: 10,
   },
   {
@@ -62,7 +62,7 @@ export const levels: Level[] = [
     factorMax: 5,
     otherMin: 1,
     otherMax: 5,
-    count: 8,
+    count: 12,
     seconds: 12,
   },
   {
@@ -78,7 +78,7 @@ export const levels: Level[] = [
     factorMax: 5,
     otherMin: 1,
     otherMax: 5,
-    count: 8,
+    count: 12,
     seconds: 12,
   },
   {
@@ -94,7 +94,7 @@ export const levels: Level[] = [
     factorMax: 9,
     otherMin: 1,
     otherMax: 9,
-    count: 8,
+    count: 12,
     seconds: 14,
   },
   {
@@ -110,7 +110,7 @@ export const levels: Level[] = [
     factorMax: 9,
     otherMin: 1,
     otherMax: 9,
-    count: 8,
+    count: 12,
     seconds: 14,
   },
   {
@@ -126,7 +126,7 @@ export const levels: Level[] = [
     factorMax: 9,
     otherMin: 1,
     otherMax: 9,
-    count: 8,
+    count: 12,
     seconds: 12,
   },
 ];
