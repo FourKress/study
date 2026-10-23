@@ -12,6 +12,10 @@
     "ed25519.-v0Bj2LKpyuu8HjZLpShWoUuoyy549X92INARoXazlM": {
       "exp": 1824249600,
       "feat": ["timed", "free", "map", "table"]
+    },
+    "p256.MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERiSrFYivJ-Uam4ZgxwyDTfpOXuHfcKiHd6qb8RYBN0vptpLGkrup7Usuu39vlP7JilWBGP0aNM7HlJcKQXeylA": {
+      "exp": 1824249600,
+      "feat": ["timed", "free", "map", "table"]
     }
   }
 }
