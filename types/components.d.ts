@@ -7,12 +7,14 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    FreePlay: typeof import('./../src/components/FreePlay.vue')['default']
+    IslandMap: typeof import('./../src/components/IslandMap.vue')['default']
+    Mascot: typeof import('./../src/components/Mascot.vue')['default']
+    PlayStage: typeof import('./../src/components/PlayStage.vue')['default']
+    ResultStage: typeof import('./../src/components/ResultStage.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    VanButton: typeof import('vant/es')['Button']
-    VanCellGroup: typeof import('vant/es')['CellGroup']
-    VanField: typeof import('vant/es')['Field']
-    VanRadio: typeof import('vant/es')['Radio']
-    VanRadioGroup: typeof import('vant/es')['RadioGroup']
+    StickerArt: typeof import('./../src/components/StickerArt.vue')['default']
+    World: typeof import('./../src/components/World.vue')['default']
   }
 }

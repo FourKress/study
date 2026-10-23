@@ -1,139 +1,116 @@
-<template>
-  <div class="container">
-    <div class="input">
-      <van-cell-group inset>
-        <van-field v-model="fieldValue" size="mini" colon type="digit" center clearable label="切换间隔(秒)" placeholder="请输入切换间隔">
-          <template #button>
-            <van-button size="mini" type="primary" @click="onConfirm">确定</van-button>
-          </template>
-        </van-field>
-      </van-cell-group>
-      <van-cell-group inset>
-        <van-radio-group v-model="maxNum" size="mini" direction="horizontal">
-          <van-radio name="5">5以内</van-radio>
-          <van-radio name="10">10以内</van-radio>
-          <van-radio name="15">15以内</van-radio>
-          <van-radio name="20">20以内</van-radio>
-        </van-radio-group>
-      </van-cell-group>
-    </div>
-    <div class="text"> {{ firstItem }} {{ calcType ? '+' : '-' }} {{ secondItem }} </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+  import World from './components/World.vue';
+  import IslandMap from './components/IslandMap.vue';
+  import FreePlay from './components/FreePlay.vue';
+  import PlayStage from './components/PlayStage.vue';
+  import ResultStage from './components/ResultStage.vue';
+  import { levels, toConfig } from './game/levels';
+  import { markClear, save } from './game/storage';
+  import { unlockAudio } from './game/sound';
+  import type { QuizConfig, RoundResult } from './game/types';
 
-  const firstItem = ref(0);
-  const secondItem = ref(0);
-  const calcType = ref(1);
-  const step = ref(3000);
-  const fieldValue = ref(3);
-  const timer = ref(0);
-  const maxNum = ref('10');
+  type Screen = 'map' | 'free' | 'play' | 'result';
 
-  const handleCompute = () => {
-    const type = Math.round(Math.random() * 10000) % 2;
-    calcType.value = type;
-    const max = parseInt(maxNum.value);
+  interface Summary extends RoundResult {
+    levelName: string;
+    sticker: string;
+    firstClear: boolean;
+    improved: boolean;
+    hasNext: boolean;
+  }
 
-    if ([15, 20].includes(max)) {
-      if (type) {
-        firstItem.value = Math.round(Math.random() * (max - 2)) + 1;
-        const secondItemValue = (secondItem.value = Math.round(Math.random() * (max - firstItem.value - 1)) + 1);
-        if (firstItem.value < max - 5) {
-          secondItem.value = Math.max(secondItemValue, max - 4 - firstItem.value);
-        } else {
-          secondItem.value = Math.round(Math.random() * (max - firstItem.value - 1)) + 1;
-        }
-      } else {
-        firstItem.value = Math.max(Math.round(Math.random() * (max - 2)) + 2, max - 4);
-        secondItem.value = Math.round(Math.random() * (firstItem.value - 2)) + 1;
-      }
-    } else {
-      if (type) {
-        firstItem.value = Math.round(Math.random() * (max - 2)) + 1;
-        secondItem.value = Math.round(Math.random() * (max - firstItem.value - 1)) + 1;
-      } else {
-        firstItem.value = Math.round(Math.random() * (max - 2)) + 2;
-        secondItem.value = Math.round(Math.random() * (firstItem.value - 2)) + 1;
-      }
+  const screen = ref<Screen>('map');
+  const config = ref<QuizConfig | null>(null);
+  const levelId = ref<string | null>(null);
+  const summary = ref<Summary | null>(null);
+  const playKey = ref(0);
+
+  const level = computed(() => levels.find((item) => item.id === levelId.value) ?? null);
+
+  function begin(id: string | null, nextConfig: QuizConfig) {
+    levelId.value = id;
+    config.value = nextConfig;
+    playKey.value += 1;
+    screen.value = 'play';
+  }
+
+  function onFinish(result: RoundResult) {
+    const current = level.value;
+    let firstClear = false;
+    let improved = false;
+    if (current) {
+      const previous = save.clears[current.id]?.stars ?? 0;
+      firstClear = previous === 0;
+      improved = result.stars > previous;
+      markClear(current.id, result.stars);
     }
-  };
+    const index = current ? levels.findIndex((item) => item.id === current.id) : -1;
+    summary.value = {
+      ...result,
+      levelName: current?.name ?? '自由练习',
+      sticker: current?.sticker ?? '',
+      firstClear,
+      improved,
+      hasNext: index >= 0 && index < levels.length - 1,
+    };
+    screen.value = 'result';
+  }
 
-  const onConfirm = () => {
-    step.value = (fieldValue.value || 3) * 1000;
-    clearInterval(timer.value);
-    handleCountDown();
-  };
+  function replay() {
+    if (!config.value) {
+      screen.value = 'map';
+      return;
+    }
+    playKey.value += 1;
+    screen.value = 'play';
+  }
 
-  const handleCountDown = () => {
-    handleCompute();
-    timer.value = setInterval(() => {
-      handleCompute();
-    }, step.value);
-  };
+  function nextLevel() {
+    const index = levels.findIndex((item) => item.id === levelId.value);
+    const next = levels[index + 1];
+    if (!next) {
+      screen.value = 'map';
+      return;
+    }
+    begin(next.id, toConfig(next));
+  }
 
-  handleCountDown();
+  function unlock() {
+    unlockAudio();
+  }
+
+  onMounted(() => window.addEventListener('pointerdown', unlock));
+  onBeforeUnmount(() => window.removeEventListener('pointerdown', unlock));
 </script>
 
-<style>
-  #app {
-    width: 100vw;
-    height: 100%;
-    box-sizing: border-box;
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
-    position: fixed;
-    overflow: hidden;
-  }
-
-  .container {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .input {
-      width: 100%;
-      position: absolute;
-      left: 0;
-      top: 10px;
-    }
-
-    .text {
-      font-size: 214px;
-      text-align: center;
-      padding-top: 100px;
-    }
-  }
-
-  .van-field {
-    padding: 0 !important;
-
-    .van-button {
-      width: 120px;
-    }
-  }
-
-  @media only screen and (min-width: 1366px) {
-    .input {
-      top: 0 !important;
-    }
-    .van-radio__icon,
-    .van-field__button {
-      transform-origin: center;
-      transform: scale(0.5);
-    }
-
-    .van-radio__label {
-      margin-left: 0 !important;
-    }
-
-    .van-radio-group {
-      transform: translateY(-10px);
-    }
-  }
-</style>
+<template>
+  <World>
+    <Transition name="fade" mode="out-in">
+      <IslandMap v-if="screen === 'map'" @free="screen = 'free'" @start="begin($event.id, $event.config)" />
+      <FreePlay v-else-if="screen === 'free'" @back="screen = 'map'" @start="begin(null, $event)" />
+      <PlayStage
+        v-else-if="screen === 'play' && config"
+        :key="playKey"
+        :config="config"
+        :title="level?.name ?? '自由练习'"
+        @finish="onFinish"
+        @quit="screen = 'map'"
+      />
+      <ResultStage
+        v-else-if="screen === 'result' && summary"
+        :stars="summary.stars"
+        :total="summary.total"
+        :first-try="summary.firstTry"
+        :level-name="summary.levelName"
+        :sticker="summary.sticker"
+        :first-clear="summary.firstClear"
+        :improved="summary.improved"
+        :has-next="summary.hasNext"
+        @again="replay"
+        @next="nextLevel"
+        @home="screen = 'map'"
+      />
+    </Transition>
+  </World>
+</template>

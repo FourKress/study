@@ -37,6 +37,10 @@ export default function ({ command, mode }: ConfigEnv): UserConfig {
       hmr: true,
       proxy: proxyConfig,
     },
+    preview: {
+      port: 2222,
+      host: true,
+    },
     plugins: createVitePlugins(viteEnv, isProduction),
     build: {
       minify: 'terser',

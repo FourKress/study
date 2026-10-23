@@ -22,7 +22,7 @@ module.exports = {
       landscapeUnit: 'rem', //横屏时使用的单位
       landscapeWidth: 1134, //横屏时使用的视口宽度
       include: [],
-      exclude: [], // 设置忽略文件，用正则做目录名匹配
+      exclude: [/island\.css/],
       customFun: ({ file }) => {
         // 这个自定义的方法是针对处理vant组件下的设计稿为375问题
         const designWidth = judgeComponent(file) ? 375 : 750;
