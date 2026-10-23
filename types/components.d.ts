@@ -16,6 +16,8 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     StickerArt: typeof import('./../src/components/StickerArt.vue')['default']
+    TimesLesson: typeof import('./../src/components/TimesLesson.vue')['default']
+    TimesTable: typeof import('./../src/components/TimesTable.vue')['default']
     World: typeof import('./../src/components/World.vue')['default']
   }
 }

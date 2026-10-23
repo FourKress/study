@@ -6,12 +6,13 @@
   import FreePlay from './components/FreePlay.vue';
   import PlayStage from './components/PlayStage.vue';
   import ResultStage from './components/ResultStage.vue';
+  import TimesTable from './components/TimesTable.vue';
   import { levels, toConfig } from './game/levels';
   import { markClear, save } from './game/storage';
   import { setMusicLayer, startMusic, stopMusic, unlockAudio } from './game/sound';
   import type { QuizConfig, RoundResult } from './game/types';
 
-  type Screen = 'home' | 'map' | 'free' | 'timed' | 'play' | 'result';
+  type Screen = 'home' | 'map' | 'free' | 'timed' | 'play' | 'result' | 'table';
   type Sky = 'clear' | 'wind' | 'rain' | 'storm';
 
   interface Summary extends RoundResult {
@@ -134,7 +135,14 @@
 <template>
   <World :sky="sky" :bolt-key="boltKey" :drops="drops">
     <Transition name="fade" mode="out-in">
-      <HomeGate v-if="screen === 'home'" @map="screen = 'map'" @free="screen = 'free'" @timed="screen = 'timed'" />
+      <HomeGate
+        v-if="screen === 'home'"
+        @map="screen = 'map'"
+        @free="screen = 'free'"
+        @timed="screen = 'timed'"
+        @table="screen = 'table'"
+      />
+      <TimesTable v-else-if="screen === 'table'" @back="screen = 'home'" />
       <IslandMap v-else-if="screen === 'map'" @back="screen = 'home'" @start="begin($event.id, $event.config)" />
       <FreePlay v-else-if="screen === 'free'" @back="screen = 'home'" @start="begin(null, $event)" />
       <FreePlay v-else-if="screen === 'timed'" timed @back="screen = 'home'" @start="begin(null, $event)" />

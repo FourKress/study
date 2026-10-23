@@ -6,6 +6,7 @@
     map: [];
     free: [];
     timed: [];
+    table: [];
   }>();
 </script>
 
@@ -44,6 +45,13 @@
         <span>
           <strong>闯关练</strong>
           <small>一关一关收集贴纸</small>
+        </span>
+      </button>
+      <button class="free-card door" type="button" @click="emit('table')">
+        <span class="free-mark door-mark times">乘</span>
+        <span>
+          <strong>乘法表</strong>
+          <small>看几行几列怎样变成一个数</small>
         </span>
       </button>
     </div>
