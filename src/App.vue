@@ -28,8 +28,8 @@
   const screen = ref<Screen>('home');
   const license = ref<LicenseStatus>(
     import.meta.env.DEV && !import.meta.env.VITE_LICENSE_PUBLIC_KEY
-      ? { state: 'ready', deviceId: '', message: '', features: [...FEATURES] }
-      : { state: 'loading', deviceId: '', message: '正在检查授权', features: [] },
+      ? { state: 'ready', deviceId: '', message: '', features: [...FEATURES], exp: null }
+      : { state: 'loading', deviceId: '', message: '正在检查授权', features: [], exp: null },
   );
   let licenseTask: Promise<void> | null = null;
   const sky = ref<Sky>('clear');
@@ -57,6 +57,7 @@
           deviceId: license.value.deviceId,
           message: '暂时连不上。有网时再点重新检查。',
           features: [],
+          exp: license.value.exp,
         };
       })
       .finally(() => {
@@ -199,11 +200,13 @@
         :device-id="license.deviceId"
         :message="license.message"
         :busy="license.state === 'loading'"
+        :state="license.state"
         @retry="refreshLicense"
       />
       <HomeGate
         v-else-if="screen === 'home'"
         :features="license.features"
+        :expires-at="license.exp"
         @map="enter('map')"
         @free="enter('free')"
         @timed="enter('timed')"

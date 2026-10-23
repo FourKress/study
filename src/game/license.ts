@@ -18,6 +18,7 @@ export interface LicenseStatus {
   deviceId: string;
   message: string;
   features: Feature[];
+  exp: number | null;
 }
 
 const SEEN_KEY = 'suan-suan-license-seen';
@@ -100,15 +101,34 @@ export async function checkLicense(): Promise<LicenseStatus> {
   if (!record || typeof record.exp !== 'number') {
     return status('missing', deviceId, '这台设备还未授权。复制下面的设备码，加作者微信发给他。弄好之后再点重新检查。');
   }
-  if (record.exp < Math.floor(Date.now() / 1000)) return status('expired', deviceId, '这台设备的授权到期了。加作者微信续上。');
+  if (record.exp < Math.floor(Date.now() / 1000)) {
+    return status(
+      'expired',
+      deviceId,
+      `这台设备的授权已于 ${formatLicenseDate(record.exp)} 到期。联系作者微信续上。`,
+      [],
+      record.exp,
+    );
+  }
 
   const features = Array.isArray(record.feat) ? record.feat.filter(isFeature) : [];
-  if (!features.length) return status('invalid', deviceId, '这份授权还没开放玩法。加作者微信处理。');
-  return status('ready', deviceId, '', features);
+  if (!features.length) return status('invalid', deviceId, '这份授权还没开放玩法。联系作者微信处理。', [], record.exp);
+  return status('ready', deviceId, '', features, record.exp);
 }
 
-function status(state: LicenseState, deviceId: string, message: string, features: Feature[] = []): LicenseStatus {
-  return { state, deviceId, message, features };
+export function formatLicenseDate(exp: number) {
+  const date = new Date(exp * 1000);
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+}
+
+function status(
+  state: LicenseState,
+  deviceId: string,
+  message: string,
+  features: Feature[] = [],
+  exp: number | null = null,
+): LicenseStatus {
+  return { state, deviceId, message, features, exp };
 }
 
 function isFeature(value: string): value is Feature {

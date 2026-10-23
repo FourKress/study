@@ -1,12 +1,14 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { computed, ref } from 'vue';
   import Mascot from './Mascot.vue';
   import authorWechat from '../assets/author-wechat.jpg';
+  import type { LicenseState } from '../game/license';
 
   const props = defineProps<{
     deviceId: string;
     message: string;
     busy: boolean;
+    state: LicenseState;
   }>();
 
   const emit = defineEmits<{
@@ -16,6 +18,13 @@
   const copied = ref(false);
   const showWechat = ref(false);
   let copyTimer = 0;
+
+  const contactLabel = computed(() => {
+    if (showWechat.value) return '收起二维码';
+    if (props.state === 'missing') return '申请 7 天试用';
+    if (props.state === 'expired') return '联系作者授权';
+    return '联系作者';
+  });
 
   async function copy() {
     if (!props.deviceId) return;
@@ -46,7 +55,7 @@
       <Mascot mood="idle" size="sm" />
       <div class="title-block">
         <p class="eyebrow">{{ busy ? '请稍等' : '请家长看这里' }}</p>
-        <h1>{{ busy ? '正在检查' : '还未授权' }}</h1>
+        <h1>{{ busy ? '正在检查' : state === 'expired' ? '授权到期了' : '还未授权' }}</h1>
       </div>
     </header>
 
@@ -62,7 +71,7 @@
             {{ busy ? '正在检查' : '重新检查' }}
           </button>
           <button class="ghost" type="button" @click="showWechat = !showWechat">
-            {{ showWechat ? '收起二维码' : '联系作者' }}
+            {{ contactLabel }}
           </button>
         </div>
         <figure v-if="showWechat" class="license-qr">

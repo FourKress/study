@@ -4,6 +4,10 @@
     "ed25519.rvhUceUCsMeIXxqibBZBWxdA6fBP5cUxakt7B2VhfJs": {
       "exp": 1824249600,
       "feat": ["timed", "free", "map", "table"]
+    },
+    "ed25519.224lVTH7R0fNwkGYnxhMtT9AVJyT7xzGP4y741scHc4": {
+      "exp": 1824249600,
+      "feat": ["timed", "free", "map", "table"]
     }
   }
 }
