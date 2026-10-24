@@ -8,7 +8,7 @@
   import PlayStage from './components/PlayStage.vue';
   import ResultStage from './components/ResultStage.vue';
   import TimesTable from './components/TimesTable.vue';
-  import { checkLicense, FEATURES, startInstantUse, type Feature, type LicenseStatus } from './game/license';
+  import { checkLicense, FEATURES, type Feature, type LicenseStatus } from './game/license';
   import { levels, toConfig } from './game/levels';
   import { markClear, save } from './game/storage';
   import { setMusicLayer, startMusic, stopMusic, unlockAudio } from './game/sound';
@@ -28,8 +28,8 @@
   const screen = ref<Screen>('home');
   const license = ref<LicenseStatus>(
     import.meta.env.DEV && !import.meta.env.VITE_LICENSE_PUBLIC_KEY
-      ? { state: 'ready', deviceId: '', message: '', features: [...FEATURES], exp: null, instantUntil: null, instantUsed: false }
-      : { state: 'loading', deviceId: '', message: '正在检查授权', features: [], exp: null, instantUntil: null, instantUsed: false },
+      ? { state: 'ready', deviceId: '', message: '', features: [...FEATURES], exp: null, trial: false }
+      : { state: 'loading', deviceId: '', message: '正在检查授权', features: [], exp: null, trial: false },
   );
   let licenseTask: Promise<void> | null = null;
   const sky = ref<Sky>('clear');
@@ -58,29 +58,13 @@
           message: '暂时连不上。有网时再点重新检查。',
           features: [],
           exp: license.value.exp,
-          instantUntil: license.value.instantUntil,
-          instantUsed: license.value.instantUsed,
+          trial: license.value.trial,
         };
       })
       .finally(() => {
         licenseTask = null;
       });
     return licenseTask;
-  }
-
-  async function useHour() {
-    if (license.value.state === 'loading') return;
-    if (licenseTask) await licenseTask;
-    try {
-      await startInstantUse();
-    } catch {
-      license.value = {
-        ...license.value,
-        message: '这个浏览器记不住这台设备。换一个浏览器打开。',
-      };
-      return;
-    }
-    await refreshLicense();
   }
 
   async function ensure(feature: Feature) {
@@ -218,15 +202,13 @@
         :message="license.message"
         :busy="license.state === 'loading'"
         :state="license.state"
-        :instant-used="license.instantUsed"
         @retry="refreshLicense"
-        @hour="useHour"
       />
       <HomeGate
         v-else-if="screen === 'home'"
         :features="license.features"
         :expires-at="license.exp"
-        :instant-until="license.instantUntil"
+        :trial="license.trial"
         @map="enter('map')"
         @free="enter('free')"
         @timed="enter('timed')"

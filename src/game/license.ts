@@ -19,16 +19,15 @@ export interface LicenseStatus {
   message: string;
   features: Feature[];
   exp: number | null;
-  instantUntil: number | null;
-  instantUsed: boolean;
+  trial: boolean;
 }
 
 const SEEN_KEY = 'suan-suan-license-seen';
 const DB_NAME = 'suan-suan-license';
 const STORE = 'device';
-const INSTANT_KEY = 'instant';
+const TRIAL_KEY = 'trial';
 const CLOCK_SKEW_MS = 120_000;
-const INSTANT_MS = 60 * 60 * 1000;
+const TRIAL_MS = 7 * 24 * 60 * 60 * 1000;
 
 interface StoredDevice {
   alg: 'Ed25519' | 'P-256';
@@ -64,7 +63,9 @@ export async function checkLicense(): Promise<LicenseStatus> {
     const url = new URL(`licenses.json?t=${Date.now()}`, new URL(import.meta.env.BASE_URL, window.location.href));
     response = await fetch(url, { cache: 'no-store' });
   } catch {
-    return finish(status('offline', deviceId, '暂时连不上。有网时再点重新检查。'));
+    const trial = await readyFromTrial(deviceId, false);
+    if (trial) return trial;
+    return status('offline', deviceId, '暂时连不上。有网时再点重新检查。');
   }
   if (!response.ok) return status('invalid', deviceId, '授权没有通过。加作者微信处理。');
 
@@ -103,7 +104,9 @@ export async function checkLicense(): Promise<LicenseStatus> {
 
   const record = (payload.devices as Record<string, SignedDevice>)[deviceId];
   if (!record || typeof record.exp !== 'number') {
-    return finish(status('missing', deviceId, '这台设备还未授权。复制下面的设备码，加作者微信发给他。弄好之后再点重新检查。'));
+    const trial = await readyFromTrial(deviceId, true);
+    if (trial) return trial;
+    return status('missing', deviceId, '这台设备还未授权。复制下面的设备码，加作者微信发给他。弄好之后再点重新检查。');
   }
   if (record.exp < Math.floor(Date.now() / 1000)) {
     return status(
@@ -125,31 +128,15 @@ export function formatLicenseDate(exp: number) {
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
-export function formatLicenseTime(ms: number) {
-  const date = new Date(ms);
-  const hours = `${date.getHours()}`.padStart(2, '0');
-  const minutes = `${date.getMinutes()}`.padStart(2, '0');
-  return `${hours}:${minutes}`;
-}
-
-export async function startInstantUse() {
-  const existing = await readInstantUntil();
-  if (existing) return false;
-  await writeInstantUntil(Date.now() + INSTANT_MS);
-  return true;
-}
-
-async function finish(result: LicenseStatus): Promise<LicenseStatus> {
-  if (result.state !== 'missing' && result.state !== 'offline') return result;
-  const until = await readInstantUntil();
-  if (until && until > Date.now()) {
-    if (!acceptClock()) return status('clock', result.deviceId, '这台设备的时间不对。把时间改回正确后再点重新检查。');
-    return status('ready', result.deviceId, '', [...FEATURES], null, until);
+async function readyFromTrial(deviceId: string, startIfMissing: boolean): Promise<LicenseStatus | null> {
+  let until = await readTrialUntil();
+  if (!until && startIfMissing) {
+    until = Date.now() + TRIAL_MS;
+    await writeTrialUntil(until);
   }
-  if (result.state === 'missing' && typeof until === 'number') {
-    return { ...result, instantUsed: true };
-  }
-  return result;
+  if (!until || until <= Date.now()) return null;
+  if (!acceptClock()) return status('clock', deviceId, '这台设备的时间不对。把时间改回正确后再点重新检查。');
+  return status('ready', deviceId, '', [...FEATURES], Math.floor(until / 1000), true);
 }
 
 function status(
@@ -158,9 +145,9 @@ function status(
   message: string,
   features: Feature[] = [],
   exp: number | null = null,
-  instantUntil: number | null = null,
+  trial = false,
 ): LicenseStatus {
-  return { state, deviceId, message, features, exp, instantUntil, instantUsed: false };
+  return { state, deviceId, message, features, exp, trial };
 }
 
 function isFeature(value: string): value is Feature {
@@ -281,21 +268,21 @@ function idbPut(db: IDBDatabase, device: StoredDevice) {
   });
 }
 
-async function readInstantUntil() {
+async function readTrialUntil() {
   if (!globalThis.indexedDB) return null;
   const db = await openDb();
   try {
-    const value = await idbGetRaw(db, INSTANT_KEY);
+    const value = await idbGetRaw(db, TRIAL_KEY);
     return typeof value === 'number' && Number.isFinite(value) ? value : null;
   } finally {
     db.close();
   }
 }
 
-async function writeInstantUntil(until: number) {
+async function writeTrialUntil(until: number) {
   const db = await openDb();
   try {
-    await idbPutRaw(db, INSTANT_KEY, until);
+    await idbPutRaw(db, TRIAL_KEY, until);
   } finally {
     db.close();
   }
