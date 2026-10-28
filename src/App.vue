@@ -194,7 +194,7 @@
 </script>
 
 <template>
-  <World :sky="sky" :bolt-key="boltKey" :drops="drops">
+  <World :class="{ 'motion-off': !save.motion }" :sky="sky" :bolt-key="boltKey" :drops="drops">
     <Transition name="fade" mode="out-in">
       <LicenseGate
         v-if="screen === 'home' && license.state !== 'ready'"

@@ -3,7 +3,7 @@
   import Mascot from './Mascot.vue';
   import StickerArt from './StickerArt.vue';
   import { isUnlocked, levels, toConfig } from '../game/levels';
-  import { resetSave, save, starCount, stickerCount, toggleSound } from '../game/storage';
+  import { resetSave, save, starCount, stickerCount, toggleMotion, toggleSound } from '../game/storage';
   import type { QuizConfig } from '../game/types';
 
   const emit = defineEmits<{
@@ -82,6 +82,9 @@
             <i class="pocket-seal">✿</i>{{ stickers }}
           </button>
         </div>
+        <button class="icon-btn" type="button" :aria-pressed="save.motion" @click="toggleMotion">
+          {{ save.motion ? '动画开' : '动画关' }}
+        </button>
         <button class="icon-btn" type="button" :aria-pressed="save.sound" @click="toggleSound">
           {{ save.sound ? '声音开' : '声音关' }}
         </button>

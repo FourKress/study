@@ -2609,3 +2609,21 @@ h1 {
     transform: translate(-50%, -50%) scale(1);
   }
 }
+
+.motion-off,
+.motion-off *,
+.motion-off *::before,
+.motion-off *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+.motion-off .fuse .mate,
+.motion-off .fuse .mate-op {
+  opacity: 0;
+}
+
+.motion-off .mate-result {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}

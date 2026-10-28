@@ -164,7 +164,7 @@
   }
 
   function dotDelay(r: number, c: number) {
-    if (reduced || step.value >= 3) return undefined;
+    if (reduced || !save.motion || step.value >= 3) return undefined;
     const index = (r - 1) * props.a + (c - 1);
     return { animationDelay: `${Math.min(index, 24) * 55}ms` };
   }

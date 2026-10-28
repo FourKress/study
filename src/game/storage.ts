@@ -9,10 +9,11 @@ export interface ClearRecord {
 export interface SaveData {
   clears: Record<string, ClearRecord>;
   sound: boolean;
+  motion: boolean;
 }
 
 function emptySave(): SaveData {
-  return { clears: {}, sound: true };
+  return { clears: {}, sound: true, motion: true };
 }
 
 function loadSave(): SaveData {
@@ -23,6 +24,7 @@ function loadSave(): SaveData {
     return {
       clears: data.clears && typeof data.clears === 'object' ? data.clears : {},
       sound: data.sound !== false,
+      motion: data.motion !== false,
     };
   } catch {
     return emptySave();
@@ -32,7 +34,7 @@ function loadSave(): SaveData {
 export const save = reactive<SaveData>(loadSave());
 
 function persist() {
-  localStorage.setItem(KEY, JSON.stringify({ clears: save.clears, sound: save.sound }));
+  localStorage.setItem(KEY, JSON.stringify({ clears: save.clears, sound: save.sound, motion: save.motion }));
 }
 
 export function markClear(id: string, stars: number) {
@@ -43,6 +45,11 @@ export function markClear(id: string, stars: number) {
 
 export function toggleSound() {
   save.sound = !save.sound;
+  persist();
+}
+
+export function toggleMotion() {
+  save.motion = !save.motion;
   persist();
 }
 

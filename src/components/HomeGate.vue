@@ -2,7 +2,7 @@
   import { computed } from 'vue';
   import Mascot from './Mascot.vue';
   import { formatLicenseDate, type Feature } from '../game/license';
-  import { save, toggleSound } from '../game/storage';
+  import { save, toggleMotion, toggleSound } from '../game/storage';
 
   const props = defineProps<{
     features: Feature[];
@@ -35,6 +35,9 @@
         <p v-else-if="expiresLabel" class="stats">授权到 {{ expiresLabel }}</p>
       </div>
       <div class="top-tools">
+        <button class="icon-btn" type="button" :aria-pressed="save.motion" @click="toggleMotion">
+          {{ save.motion ? '动画开' : '动画关' }}
+        </button>
         <button class="icon-btn" type="button" :aria-pressed="save.sound" @click="toggleSound">
           {{ save.sound ? '声音开' : '声音关' }}
         </button>
