@@ -16,6 +16,10 @@
     "p256.MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERiSrFYivJ-Uam4ZgxwyDTfpOXuHfcKiHd6qb8RYBN0vptpLGkrup7Usuu39vlP7JilWBGP0aNM7HlJcKQXeylA": {
       "exp": 1824249600,
       "feat": ["timed", "free", "map", "table"]
-    }
+    },
+    "ed25519.E7hpNAh2HSg5atSFYLcS5t8_Hq1YVyz84xrgvdb_0r0": {
+      "exp": 1824249600,
+      "feat": ["timed", "free", "map", "table"]
+    },
   }
 }
